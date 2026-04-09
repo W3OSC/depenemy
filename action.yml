@@ -1,0 +1,82 @@
+name: Depenemy Dependency Scanner
+description: Scans dependencies for behavioral issues, reputation red flags, and supply chain risks
+author: W3OSC
+
+branding:
+  icon: shield
+  color: red
+
+inputs:
+  token:
+    description: GitHub token for author and contributor lookups
+    required: false
+    default: ${{ github.token }}
+  paths:
+    description: Space-separated paths to scan (default: repository root)
+    required: false
+    default: "."
+  fail-on:
+    description: Minimum severity level that causes the action to fail (error|warning|info|never)
+    required: false
+    default: error
+  output-sarif:
+    description: Path to write SARIF output file (enables GitHub Code Scanning upload)
+    required: false
+    default: depenemy.sarif
+  config:
+    description: Path to .depenemy.yml config file
+    required: false
+    default: ""
+  ecosystems:
+    description: Comma-separated list of ecosystems to scan (npm,pypi,cargo) — default is auto-detect
+    required: false
+    default: ""
+  upload-sarif:
+    description: Automatically upload SARIF to GitHub Code Scanning
+    required: false
+    default: "true"
+
+outputs:
+  sarif-file:
+    description: Path to the generated SARIF file
+  findings-count:
+    description: Total number of findings
+  errors-count:
+    description: Number of error-level findings
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install depenemy
+      shell: bash
+      run: pip install depenemy
+
+    - name: Run depenemy scan
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+      run: |
+        ARGS="${{ inputs.paths }}"
+        ARGS="$ARGS --output sarif --output-file ${{ inputs.output-sarif }}"
+        ARGS="$ARGS --fail-on ${{ inputs.fail-on }}"
+
+        if [ -n "${{ inputs.config }}" ]; then
+          ARGS="$ARGS --config ${{ inputs.config }}"
+        fi
+        if [ -n "${{ inputs.ecosystems }}" ]; then
+          ARGS="$ARGS --ecosystem ${{ inputs.ecosystems }}"
+        fi
+
+        depenemy scan $ARGS
+
+    - name: Upload SARIF to GitHub Code Scanning
+      if: inputs.upload-sarif == 'true' && always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.output-sarif }}
+        category: depenemy

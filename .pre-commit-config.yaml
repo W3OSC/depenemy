@@ -1,0 +1,11 @@
+repos:
+  - repo: https://github.com/W3OSC/depenemy
+    rev: v0.1.0
+    hooks:
+      - id: depenemy
+        name: depenemy dependency scan
+        language: python
+        entry: depenemy scan
+        args: [--fail-on, error]
+        pass_filenames: false
+        always_run: true
