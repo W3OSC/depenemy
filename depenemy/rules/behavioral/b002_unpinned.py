@@ -1,4 +1,4 @@
-"""B002 — No version specified at all."""
+"""B002 - No version specified at all."""
 
 from __future__ import annotations
 

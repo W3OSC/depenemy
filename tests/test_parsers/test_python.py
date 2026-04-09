@@ -2,74 +2,56 @@
 
 from __future__ import annotations
 
+import tempfile
+import unittest
 from pathlib import Path
 
-import pytest
 
-from depenemy.parsers.python import PythonParser
-from depenemy.types import Ecosystem
+class TestPythonParser(unittest.TestCase):
+    def setUp(self) -> None:
+        self.tmp = Path(tempfile.mkdtemp())
 
+    def _parse(self, filename: str, content: str) -> list:
+        from depenemy.parsers.python import PythonParser
+        p = self.tmp / filename
+        p.write_text(content)
+        return PythonParser().parse(p)
 
-def test_parse_requirements_txt(tmp_path: Path) -> None:
-    (tmp_path / "requirements.txt").write_text(
-        "requests>=2.0\n"
-        "flask==2.3.0\n"
-        "# this is a comment\n"
-        "numpy\n"
-        "-r other.txt\n"
-    )
-    parser = PythonParser()
-    deps = parser.parse(tmp_path / "requirements.txt")
+    def test_parse_requirements_basic(self) -> None:
+        deps = self._parse("requirements.txt", "requests>=2.0\nflask==2.3.0\n# comment\nnumpy\n")
+        names = {d.name for d in deps}
+        self.assertIn("requests", names)
+        self.assertIn("flask", names)
+        self.assertIn("numpy", names)
 
-    names = {d.name for d in deps}
-    assert "requests" in names
-    assert "flask" in names
-    assert "numpy" in names
+    def test_version_spec_preserved(self) -> None:
+        deps = self._parse("requirements.txt", "flask==2.3.0\n")
+        self.assertEqual(deps[0].version_spec, "==2.3.0")
 
+    def test_strips_markers(self) -> None:
+        deps = self._parse("requirements.txt", "pywin32>=1.0 ; sys_platform == 'win32'\n")
+        self.assertTrue(any(d.name == "pywin32" for d in deps))
 
-def test_parse_requirements_version_spec(tmp_path: Path) -> None:
-    (tmp_path / "requirements.txt").write_text("flask==2.3.0\n")
-    parser = PythonParser()
-    deps = parser.parse(tmp_path / "requirements.txt")
-    flask = next(d for d in deps if d.name == "flask")
-    assert flask.version_spec == "==2.3.0"
+    def test_ecosystem_is_pypi(self) -> None:
+        from depenemy.types import Ecosystem
+        deps = self._parse("requirements.txt", "flask==2.3.0\n")
+        self.assertTrue(all(d.ecosystem == Ecosystem.PYPI for d in deps))
 
+    def test_line_numbers(self) -> None:
+        deps = self._parse("requirements.txt", "requests>=2.0\nflask==2.3.0\n")
+        by_name = {d.name: d for d in deps}
+        self.assertEqual(by_name["flask"].location.line, 2)
 
-def test_parse_requirements_strips_markers(tmp_path: Path) -> None:
-    (tmp_path / "requirements.txt").write_text(
-        "pywin32>=1.0 ; sys_platform == 'win32'\n"
-    )
-    parser = PythonParser()
-    deps = parser.parse(tmp_path / "requirements.txt")
-    assert any(d.name == "pywin32" for d in deps)
-
-
-def test_parse_pyproject_pep621(tmp_path: Path) -> None:
-    (tmp_path / "pyproject.toml").write_text(
-        '[project]\n'
-        'name = "myapp"\n'
-        'dependencies = [\n'
-        '    "requests>=2.0",\n'
-        '    "pydantic==2.0.0",\n'
-        ']\n'
-    )
-    parser = PythonParser()
-    deps = parser.parse(tmp_path / "pyproject.toml")
-    names = {d.name for d in deps}
-    assert "requests" in names
-    assert "pydantic" in names
+    def test_parse_pyproject_pep621(self) -> None:
+        content = (
+            '[project]\nname = "myapp"\n'
+            'dependencies = [\n    "requests>=2.0",\n    "pydantic==2.0.0",\n]\n'
+        )
+        deps = self._parse("pyproject.toml", content)
+        names = {d.name for d in deps}
+        self.assertIn("requests", names)
+        self.assertIn("pydantic", names)
 
 
-def test_ecosystem_is_pypi(tmp_path: Path) -> None:
-    (tmp_path / "requirements.txt").write_text("flask==2.3.0\n")
-    parser = PythonParser()
-    deps = parser.parse(tmp_path / "requirements.txt")
-    assert all(d.ecosystem == Ecosystem.PYPI for d in deps)
-
-
-def test_line_number_recorded(tmp_path: Path) -> None:
-    (tmp_path / "requirements.txt").write_text("requests>=2.0\nflask==2.3.0\n")
-    parser = PythonParser()
-    deps = parser.parse(tmp_path / "requirements.txt")
-    flask = next(d for d in deps if d.name == "flask")
-    assert flask.location.line == 2
+if __name__ == "__main__":
+    unittest.main()

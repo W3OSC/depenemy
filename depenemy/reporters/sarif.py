@@ -1,4 +1,4 @@
-"""SARIF 2.1.0 reporter — compatible with GitHub Code Scanning."""
+"""SARIF 2.1.0 reporter - compatible with GitHub Code Scanning."""
 
 from __future__ import annotations
 

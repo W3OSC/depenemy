@@ -1,0 +1,23 @@
+{
+  "name": "mixed-bad-patterns",
+  "version": "1.0.0",
+  "description": "Mix of multiple insecurity patterns in one file — integration test target",
+  "dependencies": {
+    "express": "^4.18.2",
+    "lodash": "*",
+    "axios": "latest",
+    "react": ">=17.0.0",
+    "debug": ""
+  },
+  "devDependencies": {
+    "jest": "~29.0.0",
+    "webpack": "^5.0.0 || ^4.0.0",
+    "typescript": "5.3.3"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "optionalDependencies": {
+    "fsevents": "~2.3.0"
+  }
+}

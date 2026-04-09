@@ -1,4 +1,4 @@
-"""S002 — Package has no source repository linked."""
+"""S002 - Package has no source repository linked."""
 
 from __future__ import annotations
 

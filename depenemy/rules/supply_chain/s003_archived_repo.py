@@ -1,4 +1,4 @@
-"""S003 — Source repository is archived."""
+"""S003 - Source repository is archived."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ class S003ArchivedRepo(BaseRule):
         return self._finding(
             dep,
             config,
-            f"`{dep.name}` source repository is archived — "
+            f"`{dep.name}` source repository is archived - "
             f"no further updates or security fixes will be made.",
             actual="archived",
             expected="active repository",

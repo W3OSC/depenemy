@@ -1,4 +1,4 @@
-"""R006 — Package has very few contributors on GitHub."""
+"""R006 - Package has very few contributors on GitHub."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ class R006FewContributors(BaseRule):
         config: Config,
     ) -> Optional[Finding]:
         if meta.contributor_count == 0:
-            return None  # GitHub data unavailable — skip
+            return None  # GitHub data unavailable - skip
 
         threshold = config.thresholds.min_contributors
         if meta.contributor_count < threshold:

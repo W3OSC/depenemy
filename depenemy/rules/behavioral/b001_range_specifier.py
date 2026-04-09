@@ -1,4 +1,4 @@
-"""B001 — Version range specifier used instead of exact pin."""
+"""B001 - Version range specifier used instead of exact pin."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ class B001RangeSpecifier(BaseRule):
             return self._finding(
                 dep,
                 config,
-                f"`{dep.name}` uses `{spec}` — installs any version, no pinning.",
+                f"`{dep.name}` uses `{spec}` - installs any version, no pinning.",
                 actual=spec,
                 expected="exact version, e.g. 1.2.3",
             )
@@ -39,7 +39,7 @@ class B001RangeSpecifier(BaseRule):
             return self._finding(
                 dep,
                 config,
-                f"`{dep.name}` uses range `{spec}` — pin to an exact version.",
+                f"`{dep.name}` uses range `{spec}` - pin to an exact version.",
                 actual=spec,
                 expected="exact version, e.g. 1.2.3",
             )

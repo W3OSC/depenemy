@@ -102,5 +102,5 @@ def _print_summary(result: ScanResult, console: Console) -> None:
 
     summary = ", ".join(parts) if parts else "[green]no issues[/green]"
     console.print(
-        f"\n[bold]Summary:[/bold] {len(result.dependencies)} packages scanned — {summary}\n"
+        f"\n[bold]Summary:[/bold] {len(result.dependencies)} packages scanned - {summary}\n"
     )

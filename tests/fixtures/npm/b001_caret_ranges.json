@@ -1,0 +1,14 @@
+{
+  "name": "b001-caret-test",
+  "version": "1.0.0",
+  "description": "B001 target — caret ranges allow any minor+patch update",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "lodash": "^4.17.21",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

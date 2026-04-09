@@ -1,0 +1,13 @@
+{
+  "name": "future-git-dep-test",
+  "version": "1.0.0",
+  "description": "COVERAGE GAP (no rule yet) — git URL deps bypass registry vetting, integrity checks, and audit tools",
+  "license": "MIT",
+  "dependencies": {
+    "mylib": "github:owner/mylib",
+    "helper": "git+https://github.com/owner/helper.git",
+    "util": "bitbucket:owner/util",
+    "toolkit": "gitlab:owner/toolkit",
+    "pinned-git": "github:owner/pkg#abc1234"
+  }
+}

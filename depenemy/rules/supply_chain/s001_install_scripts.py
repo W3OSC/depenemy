@@ -1,4 +1,4 @@
-"""S001 — Package has install scripts (postinstall/preinstall)."""
+"""S001 - Package has install scripts (postinstall/preinstall)."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ class S001InstallScripts(BaseRule):
     name = "Install scripts present"
     description = (
         "The package defines preinstall/postinstall scripts that execute "
-        "automatically on install — a common vector for supply chain attacks."
+        "automatically on install - a common vector for supply chain attacks."
     )
 
     def _check(

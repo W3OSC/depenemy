@@ -1,0 +1,12 @@
+{
+  "name": "b001-gte-range-test",
+  "version": "1.0.0",
+  "description": "B001 target — >= ranges have no upper bound, > is exclusive lower, compound ranges use spaces",
+  "license": "MIT",
+  "dependencies": {
+    "express": ">=4.0.0",
+    "body-parser": ">1.19.0",
+    "cors": ">=2.0.0 <3.0.0",
+    "compression": "!=1.7.3"
+  }
+}

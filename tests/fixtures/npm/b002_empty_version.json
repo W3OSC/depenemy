@@ -1,0 +1,10 @@
+{
+  "name": "b002-empty-version-test",
+  "version": "1.0.0",
+  "description": "B001+B002 target — empty string version resolves to any version (treated as '*' by npm)",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "",
+    "ms": ""
+  }
+}

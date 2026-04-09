@@ -1,0 +1,10 @@
+{
+  "name": "b002-x-version-test",
+  "version": "1.0.0",
+  "description": "B002 target — literal 'x' means unpinned (caught by B002 explicit list, NOT by B001 regex)",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "x",
+    "colors": "x"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "future-file-dep-test",
+  "version": "1.0.0",
+  "description": "COVERAGE GAP (no rule yet) — file: path deps pull unversioned local code; workspace: is similar",
+  "license": "MIT",
+  "dependencies": {
+    "shared": "file:../shared",
+    "local-utils": "file:./packages/utils",
+    "monorepo-pkg": "workspace:*",
+    "monorepo-fixed": "workspace:^1.0.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "b001-or-range-test",
+  "version": "1.0.0",
+  "description": "B001 target — || union ranges allow multiple major version bands",
+  "license": "MIT",
+  "dependencies": {
+    "webpack": "^4.0.0 || ^5.0.0",
+    "babel-loader": "^8.0.0 || ^9.0.0",
+    "postcss": "^7.0.0 || ^8.0.0"
+  }
+}

@@ -43,8 +43,8 @@ class FailOn(str, Enum):
 
 @app.command(name="scan")
 def cmd_scan(
-    paths: list[Path] = typer.Argument(
-        default=[Path(".")],
+    paths: Optional[list[Path]] = typer.Argument(
+        default=None,
         help="Paths to scan. Defaults to current directory.",
     ),
     output: OutputFormat = typer.Option(
@@ -67,12 +67,14 @@ def cmd_scan(
     ),
 ) -> None:
     """Scan dependencies for supply chain risks, reputation issues, and behavioral problems."""
+    if not paths:
+        paths = [Path(".")]
     config = load_config(config_path)
     config.no_cache = no_cache
     if github_token:
         config.github_token = github_token
 
-    console.print(f"\n[bold]depenemy[/bold] v{__version__} — scanning {len(paths)} path(s)...\n")
+    console.print(f"\n[bold]depenemy[/bold] v{__version__} - scanning {len(paths)} path(s)...\n")
 
     result = anyio.run(scan, paths, config)
 

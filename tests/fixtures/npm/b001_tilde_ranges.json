@@ -1,0 +1,13 @@
+{
+  "name": "b001-tilde-test",
+  "version": "1.0.0",
+  "description": "B001 target — tilde ranges allow patch-level updates",
+  "license": "MIT",
+  "dependencies": {
+    "express": "~4.18.2",
+    "lodash": "~4.17.21"
+  },
+  "devDependencies": {
+    "mocha": "~10.2.0"
+  }
+}

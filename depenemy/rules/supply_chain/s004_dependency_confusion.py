@@ -1,4 +1,4 @@
-"""S004 — Dependency confusion: private/scoped package found on public registry."""
+"""S004 - Dependency confusion: private/scoped package found on public registry."""
 
 from __future__ import annotations
 
@@ -55,7 +55,7 @@ class S004DependencyConfusion(BaseRule):
                     dep,
                     config,
                     f"`{dep.name}` is a scoped package that appears to be internal "
-                    f"but exists on the public registry — verify this is intentional.",
+                    f"but exists on the public registry - verify this is intentional.",
                     actual=f"public registry: {dep.name}",
                     expected="private registry only",
                 )
@@ -65,7 +65,7 @@ class S004DependencyConfusion(BaseRule):
                 dep,
                 config,
                 f"`{dep.name}` has an internal-sounding name and very low downloads "
-                f"({meta.weekly_downloads:,}/week) — possible dependency confusion attack.",
+                f"({meta.weekly_downloads:,}/week) - possible dependency confusion attack.",
                 actual=f"{meta.weekly_downloads:,} weekly downloads",
                 expected=">= 100 weekly downloads for public packages",
             )

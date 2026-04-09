@@ -1,4 +1,4 @@
-"""R005 — Package has not been updated for too long."""
+"""R005 - Package has not been updated for too long."""
 
 from __future__ import annotations
 

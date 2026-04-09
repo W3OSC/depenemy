@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-import pytest
+import unittest
+from datetime import datetime, timezone
 
 from depenemy.config import Config
 from depenemy.rules.reputation import (
@@ -15,148 +16,145 @@ from depenemy.rules.reputation import (
     R007BelowSecurityPatch,
     R008Deprecated,
 )
-from depenemy.types import Advisory, Dependency, Ecosystem, Location
-from tests.conftest import make_meta
+from depenemy.types import Advisory, Ecosystem
+from tests.conftest import make_dep, make_meta
 
 
-def dep() -> Dependency:
-    return Dependency(
-        name="test-pkg",
-        version_spec="1.0.0",
-        ecosystem=Ecosystem.NPM,
-        location=Location(file="package.json", line=1),
-        resolved_version="1.0.0",
+def _dep() -> object:
+    return make_dep("test-pkg", "1.0.0")
+
+
+def _ago(days: int) -> datetime:
+    return datetime.fromtimestamp(
+        datetime.now(timezone.utc).timestamp() - days * 86400, tz=timezone.utc
     )
 
 
-class TestR001YoungAuthor:
+class TestR001YoungAuthor(unittest.TestCase):
     rule = R001YoungAuthor()
 
     def test_flags_young_author(self) -> None:
-        result = self.rule.check(dep(), make_meta(author_age_days=100), Config())
-        assert result is not None
-        assert result.rule_id == "R001"
+        meta = make_meta("test-pkg")
+        meta.author_account_created_at = _ago(100)
+        result = self.rule.check(_dep(), meta, Config())  # type: ignore[arg-type]
+        self.assertIsNotNone(result)
+        self.assertEqual(result.rule_id, "R001")  # type: ignore[union-attr]
 
     def test_passes_old_author(self) -> None:
-        result = self.rule.check(dep(), make_meta(author_age_days=500), Config())
-        assert result is None
+        meta = make_meta("test-pkg")
+        meta.author_account_created_at = _ago(500)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
     def test_passes_no_author_data(self) -> None:
-        meta = make_meta()
+        meta = make_meta("test-pkg")
         meta.author_account_created_at = None
-        assert self.rule.check(dep(), meta, Config()) is None
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
 
-class TestR002YoungPackage:
+class TestR002YoungPackage(unittest.TestCase):
     rule = R002YoungPackage()
 
     def test_flags_young_package(self) -> None:
-        result = self.rule.check(dep(), make_meta(published_days_ago=30), Config())
-        assert result is not None
+        meta = make_meta("test-pkg")
+        meta.published_at = _ago(30)
+        self.assertIsNotNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
     def test_passes_old_package(self) -> None:
-        result = self.rule.check(dep(), make_meta(published_days_ago=400), Config())
-        assert result is None
+        meta = make_meta("test-pkg")
+        meta.published_at = _ago(400)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
 
-class TestR003LowWeeklyDownloads:
+class TestR003LowWeeklyDownloads(unittest.TestCase):
     rule = R003LowWeeklyDownloads()
 
     def test_flags_low(self) -> None:
-        result = self.rule.check(dep(), make_meta(weekly_dl=500), Config())
-        assert result is not None
+        meta = make_meta("test-pkg", weekly_downloads=500)
+        self.assertIsNotNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
     def test_passes_high(self) -> None:
-        result = self.rule.check(dep(), make_meta(weekly_dl=50000), Config())
-        assert result is None
+        meta = make_meta("test-pkg", weekly_downloads=50000)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
     def test_skips_zero(self) -> None:
-        # Zero means API unavailable
-        result = self.rule.check(dep(), make_meta(weekly_dl=0), Config())
-        assert result is None
+        meta = make_meta("test-pkg", weekly_downloads=0)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
 
-class TestR004LowTotalDownloads:
+class TestR004LowTotalDownloads(unittest.TestCase):
     rule = R004LowTotalDownloads()
 
     def test_flags_low(self) -> None:
-        result = self.rule.check(dep(), make_meta(total_dl=5000), Config())
-        assert result is not None
+        meta = make_meta("test-pkg", total_downloads=5000)
+        self.assertIsNotNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
     def test_passes_high(self) -> None:
-        result = self.rule.check(dep(), make_meta(total_dl=500000), Config())
-        assert result is None
+        meta = make_meta("test-pkg", total_downloads=500000)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
 
-class TestR005StalePackage:
+class TestR005StalePackage(unittest.TestCase):
     rule = R005StalePackage()
 
     def test_flags_stale(self) -> None:
-        result = self.rule.check(dep(), make_meta(last_published_days_ago=800), Config())
-        assert result is not None
+        meta = make_meta("test-pkg")
+        meta.last_published_at = _ago(800)
+        self.assertIsNotNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
     def test_passes_recent(self) -> None:
-        result = self.rule.check(dep(), make_meta(last_published_days_ago=100), Config())
-        assert result is None
+        meta = make_meta("test-pkg")
+        meta.last_published_at = _ago(100)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
 
-class TestR006FewContributors:
+class TestR006FewContributors(unittest.TestCase):
     rule = R006FewContributors()
 
     def test_flags_few(self) -> None:
-        result = self.rule.check(dep(), make_meta(contributors=2), Config())
-        assert result is not None
+        meta = make_meta("test-pkg", contributor_count=2)
+        self.assertIsNotNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
     def test_passes_many(self) -> None:
-        result = self.rule.check(dep(), make_meta(contributors=20), Config())
-        assert result is None
+        meta = make_meta("test-pkg", contributor_count=20)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
     def test_skips_zero(self) -> None:
-        result = self.rule.check(dep(), make_meta(contributors=0), Config())
-        assert result is None
+        meta = make_meta("test-pkg", contributor_count=0)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
 
-class TestR007BelowSecurityPatch:
+class TestR007BelowSecurityPatch(unittest.TestCase):
     rule = R007BelowSecurityPatch()
 
     def test_flags_below_patch(self) -> None:
-        meta = make_meta(target="1.0.0", latest="2.0.0")
+        meta = make_meta("test-pkg", target_version="1.0.0")
         meta.advisories = [
-            Advisory(
-                id="GHSA-test",
-                severity="high",
-                affected_range="<1.2.0",
-                patched_version="1.2.0",
-            )
+            Advisory(id="GHSA-test", severity="high", affected_range="<1.2.0", patched_version="1.2.0")
         ]
-        result = self.rule.check(dep(), meta, Config())
-        assert result is not None
-        assert "GHSA-test" in result.message
+        self.assertIsNotNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
     def test_passes_above_patch(self) -> None:
-        meta = make_meta(target="2.0.0", latest="2.0.0")
+        meta = make_meta("test-pkg", target_version="2.0.0")
         meta.advisories = [
-            Advisory(
-                id="GHSA-test",
-                severity="high",
-                affected_range="<1.2.0",
-                patched_version="1.2.0",
-            )
+            Advisory(id="GHSA-test", severity="high", affected_range="<1.2.0", patched_version="1.2.0")
         ]
-        result = self.rule.check(dep(), meta, Config())
-        assert result is None
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
 
-class TestR008Deprecated:
+class TestR008Deprecated(unittest.TestCase):
     rule = R008Deprecated()
 
     def test_flags_deprecated(self) -> None:
-        meta = make_meta(deprecated=True)
+        meta = make_meta("test-pkg", is_deprecated=True)
         meta.deprecation_message = "Use newpkg instead"
-        result = self.rule.check(dep(), meta, Config())
-        assert result is not None
-        assert "deprecated" in result.message.lower()
+        result = self.rule.check(_dep(), meta, Config())  # type: ignore[arg-type]
+        self.assertIsNotNone(result)
+        self.assertIn("deprecated", result.message.lower())  # type: ignore[union-attr]
 
     def test_passes_not_deprecated(self) -> None:
-        result = self.rule.check(dep(), make_meta(deprecated=False), Config())
-        assert result is None
+        meta = make_meta("test-pkg", is_deprecated=False)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
+
+
+if __name__ == "__main__":
+    unittest.main()

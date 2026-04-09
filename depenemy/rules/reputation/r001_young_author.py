@@ -1,4 +1,4 @@
-"""R001 — Author account is younger than threshold."""
+"""R001 - Author account is younger than threshold."""
 
 from __future__ import annotations
 

@@ -1,0 +1,13 @@
+{
+  "name": "b001-star-wildcard-test",
+  "version": "1.0.0",
+  "description": "B001+B002 target — star wildcard installs absolutely any version",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "*",
+    "react": "*"
+  },
+  "devDependencies": {
+    "webpack": "*"
+  }
+}

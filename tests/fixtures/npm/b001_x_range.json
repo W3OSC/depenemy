@@ -1,0 +1,14 @@
+{
+  "name": "b001-x-range-test",
+  "version": "1.0.0",
+  "description": "COVERAGE GAP — x-ranges like '1.x' or '1.2.x' are not caught by B001's current regex (no ^~*>=||| chars)",
+  "license": "MIT",
+  "dependencies": {
+    "mocha": "10.x",
+    "chai": "4.x.x",
+    "sinon": "15.x"
+  },
+  "devDependencies": {
+    "nyc": "1.2.x"
+  }
+}

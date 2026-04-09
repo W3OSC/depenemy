@@ -6,7 +6,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-import yaml
+try:
+    import yaml as _yaml
+    _HAS_YAML = True
+except ImportError:
+    _HAS_YAML = False
 
 from depenemy.types import Ecosystem, Severity
 
@@ -47,8 +51,6 @@ DEFAULT_RULES: dict[str, Severity] = {
     "S002": Severity.WARNING,
     "S003": Severity.ERROR,
     "S004": Severity.ERROR,
-    "C001": Severity.WARNING,
-    "C002": Severity.INFO,
     "Q001": Severity.WARNING,
 }
 
@@ -86,7 +88,10 @@ def load_config(path: Optional[Path] = None) -> Config:
         return Config()
 
     with open(config_path) as f:
-        raw = yaml.safe_load(f) or {}
+        content = f.read()
+    if not _HAS_YAML:
+        return Config()
+    raw = _yaml.safe_load(content) or {}
 
     config = Config()
 

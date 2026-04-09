@@ -1,4 +1,4 @@
-"""Q001 — Package has only one maintainer (single point of failure)."""
+"""Q001 - Package has only one maintainer (single point of failure)."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ class Q001SingleMaintainer(BaseRule):
         config: Config,
     ) -> Optional[Finding]:
         if meta.maintainer_count == 0:
-            return None  # Data unavailable — skip
+            return None  # Data unavailable - skip
 
         if meta.maintainer_count == 1:
             return self._finding(

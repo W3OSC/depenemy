@@ -1,14 +1,25 @@
-"""R007 — Target version is below the latest known security patch."""
+"""R007 - Target version is below the latest known security patch."""
 
 from __future__ import annotations
 
 from typing import Optional
 
-from packaging.version import InvalidVersion, Version
-
 from depenemy.config import Config
 from depenemy.rules.base import BaseRule
 from depenemy.types import Dependency, Finding, PackageMetadata
+
+
+def _parse_ver(v: str) -> tuple[int, int, int]:
+    try:
+        parts = v.strip().lstrip("v").split(".")[:3]
+        nums = []
+        for p in parts:
+            nums.append(int(p.split("-")[0].split("+")[0]))
+        while len(nums) < 3:
+            nums.append(0)
+        return (nums[0], nums[1], nums[2])
+    except (ValueError, AttributeError):
+        return (0, 0, 0)
 
 
 class R007BelowSecurityPatch(BaseRule):
@@ -27,19 +38,12 @@ class R007BelowSecurityPatch(BaseRule):
         if not meta.advisories:
             return None
 
-        try:
-            target = Version(meta.target_version)
-        except InvalidVersion:
-            return None
+        target = _parse_ver(meta.target_version)
 
         for advisory in meta.advisories:
             if not advisory.patched_version:
                 continue
-            try:
-                patched = Version(advisory.patched_version)
-            except InvalidVersion:
-                continue
-
+            patched = _parse_ver(advisory.patched_version)
             if target < patched:
                 return self._finding(
                     dep,

@@ -1,0 +1,13 @@
+{
+  "name": "b001-latest-tag-test",
+  "version": "1.0.0",
+  "description": "B001+B002 target — 'latest' dist-tag always installs the newest published version",
+  "license": "MIT",
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "eslint": "latest"
+  }
+}

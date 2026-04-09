@@ -1,4 +1,4 @@
-"""R003 — Low weekly download count."""
+"""R003 - Low weekly download count."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ class R003LowWeeklyDownloads(BaseRule):
         config: Config,
     ) -> Optional[Finding]:
         if meta.weekly_downloads == 0:
-            return None  # API unavailable — skip
+            return None  # API unavailable - skip
 
         threshold = config.thresholds.min_weekly_downloads
         if meta.weekly_downloads < threshold:

@@ -3,8 +3,16 @@
 from __future__ import annotations
 
 import re
-import tomllib
+import sys
 from pathlib import Path
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    try:
+        import tomllib  # type: ignore[no-redef]
+    except ImportError:
+        import tomli as tomllib  # type: ignore[no-redef,import-untyped]
 
 from depenemy.parsers.base import BaseParser
 from depenemy.types import Dependency, Ecosystem, Location
@@ -107,9 +115,8 @@ def _parse_pyproject(path: Path) -> list[Dependency]:
 def _parse_pipfile(path: Path) -> list[Dependency]:
     deps: list[Dependency] = []
     try:
-        import tomllib as _tomllib  # Pipfile is TOML-like
         with open(path, "rb") as f:
-            data = _tomllib.load(f)
+            data = tomllib.load(f)
     except Exception:
         return deps
 

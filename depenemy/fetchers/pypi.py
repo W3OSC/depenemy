@@ -49,7 +49,7 @@ class PyPIFetcher(BaseFetcher):
         latest_files = releases.get(latest, [])
         last_published_at = _earliest_upload(latest_files)
 
-        # Downloads (PyPI doesn't provide total downloads in the JSON API —
+        # Downloads (PyPI doesn't provide total downloads in the JSON API -
         # BigQuery is needed for that; we use 0 as placeholder)
         weekly_downloads = 0
         total_downloads = 0
@@ -70,7 +70,7 @@ class PyPIFetcher(BaseFetcher):
         is_deprecated = info.get("yanked", False)
         deprecation_message = info.get("yanked_reason", "") or ""
 
-        # Maintainers — PyPI JSON API exposes author field only
+        # Maintainers - PyPI JSON API exposes author field only
         author_name = info.get("author", "")
         maintainer_count = 1 if author_name else 0
 

@@ -1,4 +1,4 @@
-"""R008 — Package is officially deprecated."""
+"""R008 - Package is officially deprecated."""
 
 from __future__ import annotations
 

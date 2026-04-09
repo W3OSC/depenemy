@@ -1,0 +1,10 @@
+{
+  "name": "future-http-dep-test",
+  "version": "1.0.0",
+  "description": "COVERAGE GAP (no rule yet) — HTTP/HTTPS URL deps bypass registry, no integrity verification, MITM risk",
+  "license": "MIT",
+  "dependencies": {
+    "utils": "https://example.com/utils-1.0.0.tar.gz",
+    "legacy": "http://old-registry.example.com/packages/legacy.tar.gz"
+  }
+}

@@ -1,6 +1,6 @@
 """Parser for Solidity projects.
 
-Hardhat projects are pure npm — the NpmParser handles them automatically.
+Hardhat projects are pure npm - the NpmParser handles them automatically.
 Foundry projects declare Solidity dependencies in foundry.toml but install
 them via git submodules, not a public registry. We delegate npm detection
 to NpmParser and note that foundry.toml deps are out of scope for registry
@@ -9,8 +9,16 @@ lookups (no public registry to query).
 
 from __future__ import annotations
 
-import tomllib
+import sys
 from pathlib import Path
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    try:
+        import tomllib  # type: ignore[no-redef]
+    except ImportError:
+        import tomli as tomllib  # type: ignore[no-redef,import-untyped]
 
 from depenemy.parsers.base import BaseParser
 from depenemy.parsers.npm import NpmParser
@@ -35,13 +43,13 @@ class SolidityParser(BaseParser):
         if pkg_json.exists():
             deps.extend(self._npm_parser.parse(pkg_json))
 
-        # Parse foundry remappings — informational only, no registry to check
+        # Parse foundry remappings - informational only, no registry to check
         try:
             with open(path, "rb") as f:
                 data = tomllib.load(f)
             remappings = data.get("profile", {}).get("default", {}).get("remappings", [])
             for remap in remappings:
-                # Remappings are git submodules, not registry packages — skip
+                # Remappings are git submodules, not registry packages - skip
                 _ = remap
         except (OSError, tomllib.TOMLDecodeError):
             pass

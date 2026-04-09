@@ -2,7 +2,6 @@
 
 from depenemy.rules.base import BaseRule
 from depenemy.rules.behavioral import B001RangeSpecifier, B002Unpinned, B003LaggingVersion
-from depenemy.rules.compliance import C001RestrictiveLicense, C002NoLicense
 from depenemy.rules.quality import Q001SingleMaintainer
 from depenemy.rules.reputation import (
     R001YoungAuthor,
@@ -39,8 +38,6 @@ ALL_RULES: list[BaseRule] = [
     S002NoSourceRepo(),
     S003ArchivedRepo(),
     S004DependencyConfusion(),
-    C001RestrictiveLicense(),
-    C002NoLicense(),
     Q001SingleMaintainer(),
 ]
 

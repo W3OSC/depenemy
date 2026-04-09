@@ -1,4 +1,4 @@
-"""R002 — Package version is younger than threshold."""
+"""R002 - Package version is younger than threshold."""
 
 from __future__ import annotations
 

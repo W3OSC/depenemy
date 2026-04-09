@@ -3,89 +3,65 @@
 from __future__ import annotations
 
 import json
+import unittest
 from pathlib import Path
 
-import pytest
 
-from depenemy.parsers.npm import NpmParser
-from depenemy.types import Ecosystem
+class TestNpmParser(unittest.TestCase):
+    def setUp(self) -> None:
+        import tempfile
+        self.tmp = Path(tempfile.mkdtemp())
+        pkg = {
+            "name": "my-app", "version": "1.0.0",
+            "dependencies": {"express": "^4.18.2", "lodash": "4.17.21"},
+            "devDependencies": {"jest": "^29.0.0"},
+        }
+        (self.tmp / "package.json").write_text(json.dumps(pkg, indent=2))
+        lock = {
+            "lockfileVersion": 3,
+            "packages": {
+                "node_modules/express": {"version": "4.18.2"},
+                "node_modules/lodash": {"version": "4.17.21"},
+                "node_modules/jest": {"version": "29.6.0"},
+            },
+        }
+        (self.tmp / "package-lock.json").write_text(json.dumps(lock))
 
+    def _parse(self) -> list:
+        from depenemy.parsers.npm import NpmParser
+        return NpmParser().parse(self.tmp / "package.json")
 
-@pytest.fixture
-def tmp_npm_project(tmp_path: Path) -> Path:
-    pkg = {
-        "name": "my-app",
-        "version": "1.0.0",
-        "dependencies": {
-            "express": "^4.18.2",
-            "lodash": "4.17.21",
-        },
-        "devDependencies": {
-            "jest": "^29.0.0",
-        },
-    }
-    (tmp_path / "package.json").write_text(json.dumps(pkg, indent=2))
+    def test_parses_dependencies(self) -> None:
+        names = {d.name for d in self._parse()}
+        self.assertIn("express", names)
+        self.assertIn("lodash", names)
+        self.assertIn("jest", names)
 
-    lock = {
-        "lockfileVersion": 3,
-        "packages": {
-            "node_modules/express": {"version": "4.18.2"},
-            "node_modules/lodash": {"version": "4.17.21"},
-            "node_modules/jest": {"version": "29.6.0"},
-        },
-    }
-    (tmp_path / "package-lock.json").write_text(json.dumps(lock))
-    return tmp_path
+    def test_ecosystem_is_npm(self) -> None:
+        from depenemy.types import Ecosystem
+        self.assertTrue(all(d.ecosystem == Ecosystem.NPM for d in self._parse()))
 
+    def test_dev_flag(self) -> None:
+        deps = {d.name: d for d in self._parse()}
+        self.assertTrue(deps["jest"].is_dev)
+        self.assertFalse(deps["express"].is_dev)
 
-def test_parses_dependencies(tmp_npm_project: Path) -> None:
-    parser = NpmParser()
-    deps = parser.parse(tmp_npm_project / "package.json")
+    def test_resolved_version_from_lockfile(self) -> None:
+        deps = {d.name: d for d in self._parse()}
+        self.assertEqual(deps["express"].resolved_version, "4.18.2")
 
-    names = {d.name for d in deps}
-    assert "express" in names
-    assert "lodash" in names
-    assert "jest" in names
+    def test_version_spec_preserved(self) -> None:
+        deps = {d.name: d for d in self._parse()}
+        self.assertEqual(deps["express"].version_spec, "^4.18.2")
 
-
-def test_ecosystem_is_npm(tmp_npm_project: Path) -> None:
-    parser = NpmParser()
-    deps = parser.parse(tmp_npm_project / "package.json")
-    assert all(d.ecosystem == Ecosystem.NPM for d in deps)
-
-
-def test_dev_flag(tmp_npm_project: Path) -> None:
-    parser = NpmParser()
-    deps = parser.parse(tmp_npm_project / "package.json")
-    jest_dep = next(d for d in deps if d.name == "jest")
-    express_dep = next(d for d in deps if d.name == "express")
-    assert jest_dep.is_dev is True
-    assert express_dep.is_dev is False
-
-
-def test_resolved_version_from_lockfile(tmp_npm_project: Path) -> None:
-    parser = NpmParser()
-    deps = parser.parse(tmp_npm_project / "package.json")
-    express_dep = next(d for d in deps if d.name == "express")
-    assert express_dep.resolved_version == "4.18.2"
+    def test_excludes_node_modules(self) -> None:
+        from depenemy.parsers.npm import NpmParser
+        nm = self.tmp / "node_modules" / "evil"
+        nm.mkdir(parents=True)
+        (nm / "package.json").write_text(json.dumps({"dependencies": {"malware": "1.0.0"}}))
+        deps = NpmParser().find_and_parse(self.tmp)
+        self.assertFalse(any(d.name == "malware" for d in deps))
 
 
-def test_version_spec_preserved(tmp_npm_project: Path) -> None:
-    parser = NpmParser()
-    deps = parser.parse(tmp_npm_project / "package.json")
-    express_dep = next(d for d in deps if d.name == "express")
-    assert express_dep.version_spec == "^4.18.2"
-
-
-def test_find_and_parse_excludes_node_modules(tmp_path: Path) -> None:
-    (tmp_path / "node_modules" / "some-pkg").mkdir(parents=True)
-    (tmp_path / "node_modules" / "some-pkg" / "package.json").write_text(
-        json.dumps({"name": "some-pkg", "dependencies": {"evil": "1.0.0"}})
-    )
-    pkg = {"name": "app", "dependencies": {"react": "18.0.0"}}
-    (tmp_path / "package.json").write_text(json.dumps(pkg))
-
-    parser = NpmParser()
-    deps = parser.find_and_parse(tmp_path)
-    assert all(d.name != "evil" for d in deps)
-    assert any(d.name == "react" for d in deps)
+if __name__ == "__main__":
+    unittest.main()

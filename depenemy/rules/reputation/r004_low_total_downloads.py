@@ -1,4 +1,4 @@
-"""R004 — Low total download count."""
+"""R004 - Low total download count."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ class R004LowTotalDownloads(BaseRule):
         config: Config,
     ) -> Optional[Finding]:
         if meta.total_downloads == 0:
-            return None  # API unavailable — skip
+            return None  # API unavailable - skip
 
         threshold = config.thresholds.min_total_downloads
         if meta.total_downloads < threshold:

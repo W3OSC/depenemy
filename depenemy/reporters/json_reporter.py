@@ -1,4 +1,4 @@
-"""JSON reporter — raw structured output."""
+"""JSON reporter - raw structured output."""
 
 from __future__ import annotations
 
