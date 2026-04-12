@@ -71,7 +71,7 @@ class NpmFetcher(BaseFetcher):
 
         # Publish dates
         times = data.get("time", {})
-        published_at = _parse_date(times.get(target))
+        published_at = _parse_date(times.get("created"))  # when package was first published
         last_published_at = _parse_date(times.get(latest))
 
         # Maintainers

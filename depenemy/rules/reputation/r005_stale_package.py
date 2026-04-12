@@ -12,9 +12,9 @@ from depenemy.types import Dependency, Finding, PackageMetadata
 
 class R005StalePackage(BaseRule):
     id = "R005"
-    name = "Stale package"
+    name = "No updates in 2+ years"
     description = (
-        "The package has not been published in a long time, "
+        "The package has not been published in over 2 years, "
         "suggesting it may be abandoned."
     )
 

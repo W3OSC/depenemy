@@ -12,10 +12,10 @@ from depenemy.types import Dependency, Finding, PackageMetadata
 
 class R002YoungPackage(BaseRule):
     id = "R002"
-    name = "Young package version"
+    name = "New package"
     description = (
-        "The package version was published recently. "
-        "New versions have less community scrutiny."
+        "The package was first published less than 6 months ago. "
+        "New packages have no track record and less community scrutiny."
     )
 
     def _check(
