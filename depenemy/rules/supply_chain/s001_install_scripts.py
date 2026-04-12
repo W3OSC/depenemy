@@ -29,8 +29,9 @@ class S001InstallScripts(BaseRule):
         return self._finding(
             dep,
             config,
-            f"`{dep.name}` has install scripts (preinstall/postinstall) "
-            f"that execute code at install time. Audit before use.",
+            f"`{dep.name}` runs code automatically on `npm install`. "
+            f"If this package is compromised, the malicious code executes on every developer machine "
+            f"and CI server without any prompt or approval. Audit the install script before use.",
             actual="has install scripts",
             expected="no install scripts",
         )
