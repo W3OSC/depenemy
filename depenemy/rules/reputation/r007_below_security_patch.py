@@ -6,7 +6,7 @@ from typing import Optional
 
 from depenemy.config import Config
 from depenemy.rules.base import BaseRule
-from depenemy.types import Dependency, Finding, PackageMetadata
+from depenemy.types import Dependency, Finding, PackageMetadata, Severity
 
 
 def _parse_ver(v: str) -> tuple[int, int, int]:
@@ -24,7 +24,7 @@ def _parse_ver(v: str) -> tuple[int, int, int]:
 
 class R007BelowSecurityPatch(BaseRule):
     id = "R007"
-    name = "Below security patch"
+    name = "Known vulnerable version"
     description = (
         "The target version is older than a version released to fix a known vulnerability."
     )
@@ -45,6 +45,10 @@ class R007BelowSecurityPatch(BaseRule):
                 continue
             patched = _parse_ver(advisory.patched_version)
             if target < patched:
+                severity = (
+                    Severity.WARNING if advisory.severity == "low"
+                    else config.rule_severity(self.id)
+                )
                 return self._finding(
                     dep,
                     config,
@@ -52,5 +56,6 @@ class R007BelowSecurityPatch(BaseRule):
                     f"({advisory.severity}). Patched in {advisory.patched_version}.",
                     actual=meta.target_version,
                     expected=f">= {advisory.patched_version}",
+                    severity=severity,
                 )
         return None
