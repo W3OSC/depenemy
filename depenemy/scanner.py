@@ -115,8 +115,9 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
             for dep in unique_deps:
                 tg.start_soon(fetch_one, dep)
 
-    # 4. Run rules against every dep (including duplicates with different locations)
+    # 4. Run rules against every dep, deduplicate by (package, rule_id)
     findings: list[Finding] = []
+    seen_findings: set[tuple[str, str, str]] = set()
     for dep in deps:
         meta = metadata_map.get((dep.name, dep.ecosystem.value))
         if meta is None:
@@ -124,7 +125,10 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
         for rule in ALL_RULES:
             finding = rule.check(dep, meta, config)
             if finding:
-                findings.append(finding)
+                key = (dep.name, dep.ecosystem.value, rule.id)
+                if key not in seen_findings:
+                    seen_findings.add(key)
+                    findings.append(finding)
 
     return ScanResult(
         dependencies=unique_deps,

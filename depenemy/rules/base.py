@@ -40,11 +40,12 @@ class BaseRule(ABC):
         message: str,
         actual: Optional[str] = None,
         expected: Optional[str] = None,
+        severity: Optional[Severity] = None,
     ) -> Finding:
         return Finding(
             rule_id=self.id,
             rule_name=self.name,
-            severity=config.rule_severity(self.id),
+            severity=severity if severity is not None else config.rule_severity(self.id),
             dependency=dep,
             message=message,
             actual=actual,

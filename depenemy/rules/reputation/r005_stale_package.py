@@ -24,6 +24,8 @@ class R005StalePackage(BaseRule):
         meta: PackageMetadata,
         config: Config,
     ) -> Optional[Finding]:
+        if dep.is_dev:
+            return None
         if not meta.last_published_at:
             return None
 

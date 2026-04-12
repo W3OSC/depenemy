@@ -75,11 +75,11 @@ class TestB003LaggingVersion(unittest.TestCase):
         self.assertIsNotNone(result)
 
     def test_flags_minor_lag_beyond_threshold(self) -> None:
-        meta = make_meta("test-pkg", latest_version="1.6.0", target_version="1.0.0")
+        meta = make_meta("test-pkg", latest_version="1.11.0", target_version="1.0.0")
         self.assertIsNotNone(self.rule.check(_dep("1.0.0", "1.0.0"), meta, self.cfg))
 
     def test_passes_within_threshold(self) -> None:
-        meta = make_meta("test-pkg", latest_version="1.2.0", target_version="1.0.0")
+        meta = make_meta("test-pkg", latest_version="1.6.0", target_version="1.0.0")
         self.assertIsNone(self.rule.check(_dep("1.0.0", "1.0.0"), meta, self.cfg))
 
     def test_passes_up_to_date(self) -> None:

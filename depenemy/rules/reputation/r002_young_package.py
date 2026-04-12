@@ -24,6 +24,8 @@ class R002YoungPackage(BaseRule):
         meta: PackageMetadata,
         config: Config,
     ) -> Optional[Finding]:
+        if dep.is_dev:
+            return None
         if not meta.published_at:
             return None
 

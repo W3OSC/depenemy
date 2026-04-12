@@ -8,29 +8,26 @@ thresholds:
   min_package_age_days: 180
   max_stale_days: 730
   min_contributors: 5
-  max_version_lag: 5            # how many major/minor versions behind is too old
-  typosquatting_distance: 2     # max edit distance to flag as typosquatting
+  max_version_lag: 10           # how many minor versions behind is too old
+  typosquatting_distance: 1     # max edit distance to flag as typosquatting
 
 rules:
-  B001: warning   # range specifier (^, ~, >=, >, *)
-  B002: warning   # no version pinned
-  B003: warning   # target version lagging behind latest
-  R001: error     # young author account
-  R002: warning   # young package/version
-  R003: warning   # low weekly downloads
-  R004: warning   # low total downloads
-  R005: warning   # stale package
-  R006: warning   # few contributors
-  R007: error     # target version below known security patch
-  R008: error     # package officially deprecated
-  R009: error     # typosquatting suspected
-  S001: error     # install scripts present
-  S002: warning   # no source repository linked
-  S003: error     # source repository archived or deleted
-  S004: error     # dependency confusion (private package on public registry)
-  C001: warning   # restrictive license (GPL, AGPL, LGPL)
-  C002: info      # no license specified
-  Q001: warning   # single maintainer
+  B001: warning  # range specifier (^, ~, >=, >, *) — enables axios-style attacks
+  B002: warning  # no version pinned
+  B003: warning  # target version lagging behind latest
+  R001: error    # young author account
+  R002: warning  # young package/version
+  R003: warning  # low weekly downloads
+  R004: warning  # low total downloads
+  R005: warning  # stale package
+  R006: warning  # few contributors
+  R007: error    # target version below known security patch
+  R008: error    # package officially deprecated
+  R009: error    # typosquatting suspected
+  S001: error    # install scripts present
+  S002: warning  # no source repository linked
+  S003: error    # source repository archived or deleted
+  S004: error    # dependency confusion (private package on public registry)
 
 # Packages to ignore (with reason)
 ignore: []

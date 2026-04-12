@@ -17,7 +17,8 @@ class B001RangeSpecifier(BaseRule):
     name = "Range specifier"
     description = (
         "Dependency uses a version range instead of an exact pin. "
-        "Ranges allow unreviewed updates to silently enter the supply chain."
+        "Ranges allow unreviewed updates to silently enter the supply chain "
+        "(e.g. the axios supply chain attack exploited a ^ range)."
     )
 
     def _check(
@@ -26,12 +27,17 @@ class B001RangeSpecifier(BaseRule):
         meta: PackageMetadata,
         config: Config,
     ) -> Optional[Finding]:
+        if dep.is_dev:
+            return None  # ranges are standard practice for dev/build tools
         spec = dep.version_spec.strip()
+        if spec.startswith("workspace:"):
+            return None  # monorepo local package reference, not a registry range
         if spec in ("*", "", "latest"):
             return self._finding(
                 dep,
                 config,
-                f"`{dep.name}` uses `{spec}` - installs any version, no pinning.",
+                f"`{dep.name}` uses `{spec}` - any version can be installed automatically "
+                f"without your approval. This is how supply chain attacks like axios happen.",
                 actual=spec,
                 expected="exact version, e.g. 1.2.3",
             )
@@ -39,7 +45,8 @@ class B001RangeSpecifier(BaseRule):
             return self._finding(
                 dep,
                 config,
-                f"`{dep.name}` uses range `{spec}` - pin to an exact version.",
+                f"`{dep.name}` uses range `{spec}` - a malicious update can be pulled in "
+                f"automatically without your approval. Pin to an exact version.",
                 actual=spec,
                 expected="exact version, e.g. 1.2.3",
             )

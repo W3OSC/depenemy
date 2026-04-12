@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import re
 from typing import Optional
 
 from depenemy.config import Config
 from depenemy.rules.base import BaseRule
 from depenemy.types import Dependency, Finding, PackageMetadata
+
+_RANGE_PATTERN = re.compile(r"[\^~*]|>=|<=|>|!=|\|\|")
 
 
 def _parse_ver(v: str) -> tuple[int, int, int]:
@@ -33,6 +36,11 @@ class B003LaggingVersion(BaseRule):
         meta: PackageMetadata,
         config: Config,
     ) -> Optional[Finding]:
+        if dep.is_dev:
+            return None  # dev tool versions are not supply chain risks
+        spec = dep.version_spec.strip()
+        if spec in ("*", "", "latest") or _RANGE_PATTERN.search(spec):
+            return None  # B001 already flags range specifiers; lag is meaningless without a pinned version
         target = _parse_ver(meta.target_version)
         latest = _parse_ver(meta.latest_version)
 

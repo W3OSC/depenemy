@@ -20,6 +20,8 @@ class R004LowTotalDownloads(BaseRule):
         meta: PackageMetadata,
         config: Config,
     ) -> Optional[Finding]:
+        if dep.is_dev:
+            return None
         if meta.total_downloads == 0:
             return None  # API unavailable - skip
 

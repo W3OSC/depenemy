@@ -30,8 +30,8 @@ class Thresholds:
     min_package_age_days: int = 180
     max_stale_days: int = 730
     min_contributors: int = 5
-    max_version_lag: int = 5
-    typosquatting_distance: int = 2
+    max_version_lag: int = 10
+    typosquatting_distance: int = 1
 
 
 DEFAULT_RULES: dict[str, Severity] = {
@@ -51,7 +51,6 @@ DEFAULT_RULES: dict[str, Severity] = {
     "S002": Severity.WARNING,
     "S003": Severity.ERROR,
     "S004": Severity.ERROR,
-    "Q001": Severity.WARNING,
 }
 
 

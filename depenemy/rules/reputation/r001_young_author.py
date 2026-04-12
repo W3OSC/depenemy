@@ -24,6 +24,8 @@ class R001YoungAuthor(BaseRule):
         meta: PackageMetadata,
         config: Config,
     ) -> Optional[Finding]:
+        if dep.is_dev:
+            return None
         if not meta.author_account_created_at:
             return None
 

@@ -20,6 +20,8 @@ class R003LowWeeklyDownloads(BaseRule):
         meta: PackageMetadata,
         config: Config,
     ) -> Optional[Finding]:
+        if dep.is_dev:
+            return None
         if meta.weekly_downloads == 0:
             return None  # API unavailable - skip
 
