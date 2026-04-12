@@ -23,11 +23,11 @@ class R008Deprecated(BaseRule):
         if not meta.is_deprecated:
             return None
 
-        detail = f": {meta.deprecation_message}" if meta.deprecation_message else ""
+        detail = meta.deprecation_message or "no replacement specified"
         return self._finding(
             dep,
             config,
-            f"`{dep.name}` is officially deprecated{detail}",
+            f"`{dep.name}` is officially deprecated: {detail}",
             actual="deprecated",
-            expected="not deprecated",
+            expected=detail,
         )

@@ -54,7 +54,7 @@ class R007BelowSecurityPatch(BaseRule):
                     config,
                     f"`{dep.name}@{meta.target_version}` is affected by {advisory.id} "
                     f"({advisory.severity}). Patched in {advisory.patched_version}.",
-                    actual=meta.target_version,
+                    actual=f"{meta.target_version} [{advisory.severity} CVE]",
                     expected=f">= {advisory.patched_version}",
                     severity=severity,
                 )
