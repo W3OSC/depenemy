@@ -18,6 +18,7 @@ from depenemy.rules.supply_chain import (
     S002NoSourceRepo,
     S003ArchivedRepo,
     S004DependencyConfusion,
+    S005MaliciousPackage,
 )
 
 ALL_RULES: list[BaseRule] = [
@@ -37,6 +38,7 @@ ALL_RULES: list[BaseRule] = [
     S002NoSourceRepo(),
     S003ArchivedRepo(),
     S004DependencyConfusion(),
+    S005MaliciousPackage(),
 ]
 
 __all__ = ["ALL_RULES", "BaseRule"]

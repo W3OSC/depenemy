@@ -51,6 +51,7 @@ DEFAULT_RULES: dict[str, Severity] = {
     "S002": Severity.WARNING,
     "S003": Severity.ERROR,
     "S004": Severity.ERROR,
+    "S005": Severity.ERROR,
 }
 
 

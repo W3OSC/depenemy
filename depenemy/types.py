@@ -77,6 +77,7 @@ class PackageMetadata:
     license: Optional[str] = None
     is_archived: bool = False
     advisories: list[Advisory] = field(default_factory=list)
+    malicious_advisories: list[Advisory] = field(default_factory=list)
 
 
 @dataclass

@@ -105,6 +105,66 @@ class OSVAdvisor:
         return result
 
 
+_MALICIOUS_KEYWORDS = frozenset([
+    "malicious", "backdoor", "supply chain attack", "typosquat",
+    "compromised", "hijack", "exfiltrat", "credential steal",
+])
+
+
+class MaliciousAdvisoryChecker:
+    """Checks if a package has any history of malicious activity in OSV."""
+
+    def __init__(self, advisor: "OSVAdvisor") -> None:
+        self._advisor = advisor
+
+    async def check(self, name: str, ecosystem: Ecosystem) -> list[Advisory]:
+        osv_ecosystem = _ECOSYSTEM_MAP.get(ecosystem)
+        if not osv_ecosystem:
+            return []
+
+        cache_key = f"osv:mal:{osv_ecosystem}:{name}"
+        cached = self._advisor._cache.get(cache_key)
+        if cached is not None:
+            return [Advisory(**a) for a in cached]
+
+        payload = {"package": {"name": name, "ecosystem": osv_ecosystem}}
+        try:
+            resp = await self._advisor._client.post(
+                f"{self._advisor.API}/query",
+                json=payload,
+                timeout=10,
+            )
+            if resp.status_code != 200:
+                return []
+            data = resp.json()
+        except (httpx.HTTPError, json.JSONDecodeError):
+            return []
+
+        results = []
+        for vuln in data.get("vulns", []):
+            text = (
+                (vuln.get("summary", "") or "") + " " +
+                (vuln.get("details", "") or "")
+            ).lower()
+            if any(kw in text for kw in _MALICIOUS_KEYWORDS):
+                results.append(Advisory(
+                    id=vuln.get("id", ""),
+                    severity="critical",
+                    affected_range="",
+                    patched_version="",
+                    description=(vuln.get("summary", "") or vuln.get("details", ""))[:300],
+                    source="osv",
+                ))
+
+        serializable = [
+            {"id": a.id, "severity": a.severity, "affected_range": a.affected_range,
+             "patched_version": a.patched_version, "description": a.description, "source": a.source}
+            for a in results
+        ]
+        self._advisor._cache.set(cache_key, serializable)
+        return results
+
+
 def _parse_osv_response(data: dict[str, Any]) -> list[Advisory]:
     advisories = []
     for vuln in data.get("vulns", []):

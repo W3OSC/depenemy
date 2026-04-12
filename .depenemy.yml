@@ -28,6 +28,7 @@ rules:
   S002: warning  # no source repository linked
   S003: error    # source repository archived or deleted
   S004: error    # dependency confusion (private package on public registry)
+  S005: error    # known malicious package history in OSV
 
 # Packages to ignore (with reason)
 ignore: []
