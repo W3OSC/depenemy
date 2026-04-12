@@ -13,14 +13,14 @@ thresholds:
 
 rules:
   B001: warning  # range specifier (^, ~, >=, >, *) — enables axios-style attacks
-  B002: warning  # no version pinned
-  B003: warning  # target version lagging behind latest
+  B002: error    # no version pinned
+  B003: error    # target version lagging behind latest
   R001: error    # young author account
-  R002: warning  # young package/version
-  R003: warning  # low weekly downloads
-  R004: warning  # low total downloads
-  R005: warning  # stale package
-  R006: warning  # few contributors
+  R002: error    # young package/version
+  R003: error    # low weekly downloads
+  R004: error    # low total downloads
+  R005: error    # stale package
+  R006: error    # few contributors
   R007: error    # target version below known security patch
   R008: error    # package officially deprecated
   R009: error    # typosquatting suspected
