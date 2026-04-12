@@ -57,14 +57,10 @@ class PyPIFetcher(BaseFetcher):
         # License
         license_val = info.get("license", "") or ""
 
-        # Repository URL
+        # Repository URL - PyPI packages use inconsistent key names,
+        # so scan all project_urls for a GitHub/GitLab URL first
         project_urls: dict[str, str] = info.get("project_urls") or {}
-        repo_url = (
-            project_urls.get("Source")
-            or project_urls.get("Repository")
-            or project_urls.get("Homepage")
-            or info.get("home_page")
-        )
+        repo_url = _find_repo_url(project_urls, info.get("home_page"))
 
         # Deprecated: PyPI uses yanked releases
         is_deprecated = info.get("yanked", False)
@@ -107,6 +103,27 @@ class PyPIFetcher(BaseFetcher):
             deprecation_message=deprecation_message,
             license=license_val or None,
         )
+
+
+_REPO_HOSTS = ("github.com", "gitlab.com", "bitbucket.org")
+_PREFERRED_KEYS = ("Source", "Source Code", "Source code", "Repository", "Code", "GitHub", "GitLab")
+
+
+def _find_repo_url(project_urls: dict[str, str], home_page: Optional[str]) -> Optional[str]:
+    """Find a source repository URL from PyPI project_urls, trying preferred keys first,
+    then falling back to any URL that points to a known code hosting service."""
+    for key in _PREFERRED_KEYS:
+        url = project_urls.get(key)
+        if url and any(h in url for h in _REPO_HOSTS):
+            return url
+    # Scan all values for a repo host URL
+    for url in project_urls.values():
+        if url and any(h in url for h in _REPO_HOSTS):
+            return url
+    # Last resort: home_page if it points to a repo host
+    if home_page and any(h in home_page for h in _REPO_HOSTS):
+        return home_page
+    return None
 
 
 def _earliest_upload(files: list[dict[str, Any]]) -> Optional[datetime]:

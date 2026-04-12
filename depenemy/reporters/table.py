@@ -92,8 +92,7 @@ def _print_summary(result: ScanResult, console: Console) -> None:
     infos = len(result.infos)
 
     parts = []
-    if errors:
-        parts.append(f"[red]{errors} error(s)[/red]")
+    parts.append(f"[red]{errors} error(s)[/red]")
     if warnings:
         parts.append(f"[yellow]{warnings} warning(s)[/yellow]")
     if infos:
