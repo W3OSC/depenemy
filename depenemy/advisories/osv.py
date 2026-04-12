@@ -105,10 +105,22 @@ class OSVAdvisor:
         return result
 
 
-_MALICIOUS_KEYWORDS = frozenset([
-    "malicious", "backdoor", "supply chain attack", "typosquat",
-    "compromised", "hijack", "exfiltrat", "credential steal",
-])
+_MALICIOUS_PHRASES = [
+    "published with malicious code",
+    "embedded malicious code",
+    "including malicious code",
+    "malicious code was introduced",
+    "malicious code was added",
+    "malicious code that was introduced",
+    "considered malicious",
+    "malicious actor added this package",
+    "malicious npm package",
+    "malicious pypi package",
+    "package was compromised",
+    "account was compromised",
+    "backdoor",
+    "supply chain attack on",
+]
 
 
 class MaliciousAdvisoryChecker:
@@ -146,7 +158,7 @@ class MaliciousAdvisoryChecker:
                 (vuln.get("summary", "") or "") + " " +
                 (vuln.get("details", "") or "")
             ).lower()
-            if any(kw in text for kw in _MALICIOUS_KEYWORDS):
+            if any(phrase in text for phrase in _MALICIOUS_PHRASES):
                 results.append(Advisory(
                     id=vuln.get("id", ""),
                     severity="critical",
