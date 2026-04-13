@@ -16,7 +16,7 @@ from depenemy.rules.reputation import (
     R007BelowSecurityPatch,
     R008Deprecated,
 )
-from depenemy.types import Advisory, Ecosystem
+from depenemy.types import Advisory
 from tests.conftest import make_dep, make_meta
 
 

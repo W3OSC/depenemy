@@ -183,7 +183,7 @@ def _coverage_report(patterns: list[PatternEntry]) -> str:
     lines = [
         "",
         "=" * 70,
-        f"  DEPENEMY DETECTION COVERAGE REPORT",
+        "  DEPENEMY DETECTION COVERAGE REPORT",
         f"  Detected: {detected}/{total} patterns  ({rate:.1f}%)",
         "=" * 70,
     ]
