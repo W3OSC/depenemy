@@ -78,7 +78,7 @@ class OSVAdvisor:
         cache_key = f"osv:pkg:{osv_ecosystem}:{name}"
         cached = self._cache.get(cache_key)
         if cached is not None:
-            return cached.get("patched")
+            return cached.get("patched")  # type: ignore[no-any-return]
 
         payload = {"package": {"name": name, "ecosystem": osv_ecosystem}}
         try:

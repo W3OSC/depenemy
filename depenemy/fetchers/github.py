@@ -39,7 +39,7 @@ class GitHubFetcher:
         cache_key = f"gh:{ecosystem_key}:{name}"
         cached = self._cache.get(cache_key)
         if cached:
-            return cached  # type: ignore[return-value]
+            return cached  # type: ignore[no-any-return]
 
         result: dict[str, Any] = {
             "contributor_count": 0,
@@ -75,7 +75,7 @@ class GitHubFetcher:
                 timeout=10,
             )
             if resp.status_code == 200:
-                return resp.json()  # type: ignore[return-value]
+                return resp.json()  # type: ignore[no-any-return]
         except (httpx.HTTPError, json.JSONDecodeError):
             pass
         return None
@@ -98,7 +98,7 @@ class GitHubFetcher:
         cache_key = f"gh:user:{username}"
         cached = self._cache.get(cache_key)
         if cached:
-            return cached  # type: ignore[return-value]
+            return cached  # type: ignore[no-any-return]
         try:
             resp = await self._client.get(
                 f"{self.API}/users/{username}",
@@ -108,7 +108,7 @@ class GitHubFetcher:
             if resp.status_code == 200:
                 data = resp.json()
                 self._cache.set(cache_key, data)
-                return data  # type: ignore[return-value]
+                return data  # type: ignore[no-any-return]
         except (httpx.HTTPError, json.JSONDecodeError):
             pass
         return None

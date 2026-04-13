@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import anyio
 import httpx
@@ -131,9 +131,9 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
         for rule in ALL_RULES:
             finding = rule.check(dep, meta, config)
             if finding:
-                key = (dep.name, dep.ecosystem.value, rule.id)
-                if key not in seen_findings:
-                    seen_findings.add(key)
+                finding_key = (dep.name, dep.ecosystem.value, rule.id)
+                if finding_key not in seen_findings:
+                    seen_findings.add(finding_key)
                     findings.append(finding)
 
     return ScanResult(
@@ -143,7 +143,7 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
     )
 
 
-def _get_parsers(config: Config) -> list:
+def _get_parsers(config: Config) -> list[Any]:
     ecosystems = config.ecosystems
     all_parsers = [NpmParser(), PythonParser(), RustParser()]
     if not ecosystems:
