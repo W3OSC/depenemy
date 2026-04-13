@@ -22,11 +22,11 @@ class Severity(str, Enum):
 
     def __ge__(self, other: object) -> bool:  # type: ignore[override]
         order: list[Severity] = [Severity.INFO, Severity.WARNING, Severity.ERROR]
-        return order.index(self) >= order.index(other)  # type: ignore[arg-type]
+        return order.index(self) >= order.index(other)
 
     def __gt__(self, other: object) -> bool:  # type: ignore[override]
         order: list[Severity] = [Severity.INFO, Severity.WARNING, Severity.ERROR]
-        return order.index(self) > order.index(other)  # type: ignore[arg-type]
+        return order.index(self) > order.index(other)
 
 
 @dataclass
