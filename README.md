@@ -17,21 +17,19 @@
 | Behavioral | No version pinned | B002 |
 | Behavioral | Version significantly behind latest | B003 |
 | Reputation | Young author account (< 12 months) | R001 |
-| Reputation | Young package version (< 6 months) | R002 |
+| Reputation | New package (< 6 months since first release) | R002 |
 | Reputation | Low weekly downloads (< 1,000) | R003 |
 | Reputation | Low total downloads (< 10,000) | R004 |
-| Reputation | Stale package (> 2 years since last publish) | R005 |
+| Reputation | No updates in 2+ years | R005 |
 | Reputation | Few contributors (< 5 on GitHub) | R006 |
-| Reputation | Target version below known security patch | R007 |
+| Reputation | Known vulnerable version (OSV CVE) | R007 |
 | Reputation | Package officially deprecated | R008 |
 | Reputation | Typosquatting suspected | R009 |
 | Supply Chain | Install scripts (postinstall/preinstall) | S001 |
 | Supply Chain | No source repository linked | S002 |
 | Supply Chain | Source repository archived | S003 |
 | Supply Chain | Dependency confusion (private pkg on public registry) | S004 |
-| Compliance | Restrictive license (GPL, AGPL) | C001 |
-| Compliance | No license specified | C002 |
-| Quality | Single maintainer | Q001 |
+| Supply Chain | Known malicious package history | S005 |
 
 ## Supported ecosystems
 
