@@ -4,7 +4,7 @@ from __future__ import annotations
 import unittest
 
 try:
-    import pytest
+    import pytest  # noqa: F401
     _HAS_PYTEST = True
 except ImportError:
     _HAS_PYTEST = False

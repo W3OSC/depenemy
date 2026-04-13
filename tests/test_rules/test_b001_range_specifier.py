@@ -20,7 +20,7 @@ def load_tests(loader, tests, pattern):  # noqa: ARG001
 if _HAS_PYTEST:
     from depenemy.config import Config
     from depenemy.rules.behavioral.b001_range_specifier import B001RangeSpecifier
-    from tests.conftest import FIXTURES_NPM, make_dep, make_meta
+    from tests.conftest import make_dep, make_meta
 
     @pytest.fixture
     def rule() -> B001RangeSpecifier:

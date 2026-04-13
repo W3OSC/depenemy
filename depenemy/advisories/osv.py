@@ -126,7 +126,7 @@ _MALICIOUS_PHRASES = [
 class MaliciousAdvisoryChecker:
     """Checks if a package has any history of malicious activity in OSV."""
 
-    def __init__(self, advisor: "OSVAdvisor") -> None:
+    def __init__(self, advisor: OSVAdvisor) -> None:
         self._advisor = advisor
 
     async def check(self, name: str, ecosystem: Ecosystem) -> list[Advisory]:

@@ -22,7 +22,7 @@ else:
 
 from depenemy.parsers.base import BaseParser
 from depenemy.parsers.npm import NpmParser
-from depenemy.types import Dependency, Ecosystem, Location
+from depenemy.types import Dependency, Ecosystem
 
 
 class SolidityParser(BaseParser):

@@ -20,11 +20,11 @@ class Severity(str, Enum):
     WARNING = "warning"
     INFO = "info"
 
-    def __ge__(self, other: "Severity") -> bool:
+    def __ge__(self, other: Severity) -> bool:
         order = [Severity.INFO, Severity.WARNING, Severity.ERROR]
         return order.index(self) >= order.index(other)
 
-    def __gt__(self, other: "Severity") -> bool:
+    def __gt__(self, other: Severity) -> bool:
         order = [Severity.INFO, Severity.WARNING, Severity.ERROR]
         return order.index(self) > order.index(other)
 

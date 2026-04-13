@@ -16,11 +16,16 @@ from __future__ import annotations
 
 import unittest
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Optional
 
+from depenemy.config import Config
+from depenemy.rules.base import BaseRule
+from depenemy.rules.behavioral.b001_range_specifier import B001RangeSpecifier
+from depenemy.rules.behavioral.b002_unpinned import B002Unpinned
+from tests.conftest import FIXTURES_NPM, make_meta
+
 try:
-    import pytest
+    import pytest  # noqa: F401
     _HAS_PYTEST = True
 except ImportError:
     _HAS_PYTEST = False
@@ -30,13 +35,6 @@ def load_tests(loader, tests, pattern):  # noqa: ARG001
     if not _HAS_PYTEST:
         return unittest.TestSuite()
     return tests
-
-
-from depenemy.config import Config
-from depenemy.rules.behavioral.b001_range_specifier import B001RangeSpecifier
-from depenemy.rules.behavioral.b002_unpinned import B002Unpinned
-from depenemy.rules.base import BaseRule
-from tests.conftest import FIXTURES_NPM, make_meta
 
 # ---------------------------------------------------------------------------
 # Pattern classification
@@ -277,8 +275,8 @@ if _HAS_PYTEST:
         rate = detected / total * 100
 
         # Update this threshold as new rules are added
-        EXPECTED_MIN_RATE = 35.0  # current baseline with only B001/B002 implemented
-        assert rate >= EXPECTED_MIN_RATE, (
-            f"Detection rate {rate:.1f}% is below expected minimum {EXPECTED_MIN_RATE}%. "
+        expected_min_rate = 35.0  # current baseline with only B001/B002 implemented
+        assert rate >= expected_min_rate, (
+            f"Detection rate {rate:.1f}% is below expected minimum {expected_min_rate}%. "
             f"Detected {detected}/{total} patterns."
         )

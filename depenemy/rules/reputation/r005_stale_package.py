@@ -46,6 +46,5 @@ class R005StalePackage(BaseRule):
                 f"`{dep.name}` has not been updated in {label} "
                 f"(last publish: {last.date()}).",
                 actual=f"{days_since} days since last publish",
-                expected=f"< {threshold} days",
             )
         return None

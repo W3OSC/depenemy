@@ -6,7 +6,7 @@ import unittest
 
 from depenemy.config import Config
 from depenemy.rules.behavioral import B001RangeSpecifier, B002Unpinned, B003LaggingVersion
-from depenemy.types import Dependency, Ecosystem, Location
+from depenemy.types import Dependency
 from tests.conftest import make_dep, make_meta
 
 
