@@ -69,6 +69,12 @@ def cmd_scan(
     """Scan dependencies for supply chain risks, reputation issues, and behavioral problems."""
     if not paths:
         paths = [Path(".")]
+
+    for p in paths:
+        if not p.exists():
+            console.print(f"[red]error:[/red] path not found: {p}")
+            raise typer.Exit(1)
+
     config = load_config(config_path)
     config.no_cache = no_cache
     if github_token:
