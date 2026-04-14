@@ -1,44 +1,81 @@
-# depenemy
+<div align="center">
 
-**Your dependencies could be your enemy.** Depenemy scans your project for supply chain risks, behavioral issues, and reputation red flags before they can do damage.
+```
+██████╗ ███████╗██████╗ ███████╗███╗   ██╗███████╗███╗   ███╗██╗   ██╗
+██╔══██╗██╔════╝██╔══██╗██╔════╝████╗  ██║██╔════╝████╗ ████║╚██╗ ██╔╝
+██║  ██║█████╗  ██████╔╝█████╗  ██╔██╗ ██║█████╗  ██╔████╔██║ ╚████╔╝ 
+██║  ██║██╔══╝  ██╔═══╝ ██╔══╝  ██║╚██╗██║██╔══╝  ██║╚██╔╝██║  ╚██╔╝  
+██████╔╝███████╗██║     ███████╗██║ ╚████║███████╗██║ ╚═╝ ██║   ██║   
+╚═════╝ ╚══════╝╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝     ╚═╝   ╚═╝   
+```
+
+**Your dependencies could be your enemy.**
+
+Depenemy scans your project for supply chain risks, behavioral issues, and reputation red flags — before they can do damage.
 
 [![CI](https://github.com/W3OSC/depenemy/actions/workflows/ci.yml/badge.svg)](https://github.com/W3OSC/depenemy/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/depenemy)](https://pypi.org/project/depenemy/)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+</div>
+
+---
+
+## Why depenemy?
+
+Modern projects pull in hundreds of dependencies. Each one is a potential entry point for a supply chain attack — a compromised maintainer account, a typosquatted package, an old version with a known CVE, or a package that runs arbitrary code on install.
+
+Depenemy gives you **a single command** that audits all your dependencies across npm, Python, Rust, and Solidity — and tells you exactly what looks suspicious and why.
 
 ---
 
 ## What it detects
 
-| Category | Check | ID |
-|----------|-------|----|
-| Behavioral | Range specifier (`^`, `~`, `>=`, `*`) | B001 |
-| Behavioral | No version pinned | B002 |
-| Behavioral | Version significantly behind latest | B003 |
-| Reputation | Young author account (< 12 months) | R001 |
-| Reputation | New package (< 6 months since first release) | R002 |
-| Reputation | Low weekly downloads (< 1,000) | R003 |
-| Reputation | Low total downloads (< 10,000) | R004 |
-| Reputation | No updates in 2+ years | R005 |
-| Reputation | Few contributors (< 5 on GitHub) | R006 |
-| Reputation | Known vulnerable version (OSV CVE) | R007 |
-| Reputation | Package officially deprecated | R008 |
-| Reputation | Typosquatting suspected | R009 |
-| Supply Chain | Install scripts (postinstall/preinstall) | S001 |
-| Supply Chain | No source repository linked | S002 |
-| Supply Chain | Source repository archived | S003 |
-| Supply Chain | Dependency confusion (private pkg on public registry) | S004 |
-| Supply Chain | Known malicious package history | S005 |
+### Behavioral risks
+
+| ID | Name | Description | Severity |
+|----|------|-------------|----------|
+| B001 | Range specifier | Version uses `^`, `~`, `>=`, `*` — allows unexpected updates | Warning |
+| B002 | No version pinned | No version specified at all | Error |
+| B003 | Lagging version | Pinned version is significantly behind latest | Error |
+
+### Reputation signals
+
+| ID | Name | Description | Severity |
+|----|------|-------------|----------|
+| R001 | Young author account | Package author's GitHub account is < 12 months old | Error |
+| R002 | New package | Package was first published < 6 months ago | Error |
+| R003 | Low weekly downloads | < 1,000 weekly downloads | Error |
+| R004 | Low total downloads | < 10,000 total downloads | Error |
+| R005 | No updates in 2+ years | Last publish was over 2 years ago | Error |
+| R006 | Few contributors | Fewer than 5 contributors on GitHub | Error |
+| R007 | Known vulnerable version | Your version is below a known security patch (OSV/CVE) | Error |
+| R008 | Deprecated package | Package is officially marked as deprecated | Error |
+| R009 | Typosquatting suspected | Name is suspiciously close to a popular package | Error |
+
+### Supply chain risks
+
+| ID | Name | Description | Severity |
+|----|------|-------------|----------|
+| S001 | Install scripts | Package runs code at install time (`postinstall`, `preinstall`) | Error |
+| S002 | No source repository | No GitHub/GitLab link in package metadata | Warning |
+| S003 | Archived repository | Source repo has been archived or deleted | Error |
+| S004 | Dependency confusion | Private package name found on public registry | Error |
+| S005 | Known malicious package | Package has a recorded history of malicious activity (OSV) | Error |
+
+---
 
 ## Supported ecosystems
 
-| Ecosystem | Files |
-|-----------|-------|
-| npm / Node.js | `package.json`, `package-lock.json`, `yarn.lock` |
-| Python | `requirements*.txt`, `pyproject.toml`, `Pipfile` |
-| Rust | `Cargo.toml` |
-| Solidity | Foundry/Hardhat (delegates to npm) |
+| Ecosystem | Manifest files |
+|-----------|----------------|
+| **npm / Node.js** | `package.json`, `package-lock.json`, `yarn.lock` |
+| **Python** | `requirements*.txt`, `pyproject.toml`, `Pipfile` |
+| **Rust** | `Cargo.toml` |
+| **Solidity** | Foundry / Hardhat (delegates to npm) |
+
+---
 
 ## Installation
 
@@ -46,25 +83,54 @@
 pip install depenemy
 ```
 
+---
+
 ## Usage
 
 ### CLI
 
 ```bash
-# Scan current directory
+# Scan your project
 depenemy scan .
 
-# Scan with specific output format
+# Scan a specific file
+depenemy scan pyproject.toml
+
+# Output as SARIF (for GitHub Code Scanning)
 depenemy scan . --output sarif --output-file results.sarif
 
-# Fail on warnings too
+# Output as JSON
+depenemy scan . --output json --output-file results.json
+
+# Fail the command if any warnings exist (useful in CI)
 depenemy scan . --fail-on warning
 
-# List all rules
+# List all available rules
 depenemy rules
 ```
 
+**Example output:**
+
+```
+depenemy v0.1.0 - scanning 1 path(s)...
+
+✗  S005  Known malicious package
+   event-stream@3.3.6    malicious activity recorded  →  no malicious history
+
+✗  R007  Known vulnerable version
+   lodash@4.17.4         4.17.4 [high CVE]            →  4.17.21
+
+⚠  B001  Range specifier
+   axios@^1.4.0          range specifier              →  pinned version
+
+Summary: 42 packages scanned — 2 error(s), 1 warning(s)
+```
+
+---
+
 ### GitHub Action
+
+Add to your workflow and results appear automatically as [Code Scanning alerts](https://docs.github.com/en/code-security/code-scanning) on every pull request:
 
 ```yaml
 - name: Scan dependencies
@@ -74,11 +140,11 @@ depenemy rules
     fail-on: error
 ```
 
-Results appear as [Code Scanning alerts](https://docs.github.com/en/code-security/code-scanning) on your pull requests.
+---
 
 ### Pre-commit hook
 
-Add to your `.pre-commit-config.yaml`:
+Block pushes that introduce risky dependencies. Add to `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
@@ -88,48 +154,90 @@ repos:
       - id: depenemy
 ```
 
+---
+
 ## Configuration
 
-Create `.depenemy.yml` in your repository root:
+Create `.depenemy.yml` in your repository root to customize thresholds, severities, and ignore specific packages:
 
 ```yaml
 thresholds:
-  min_weekly_downloads: 1000
-  min_author_account_age_days: 365
-  min_package_age_days: 180
-  max_stale_days: 730
-  min_contributors: 5
+  min_weekly_downloads: 1000       # R003 threshold
+  min_total_downloads: 10000       # R004 threshold
+  min_author_account_age_days: 365 # R001 threshold
+  min_package_age_days: 180        # R002 threshold
+  max_stale_days: 730              # R005 threshold
+  min_contributors: 5              # R006 threshold
+  max_version_lag: 10              # B003 threshold (minor versions)
+  typosquatting_distance: 1        # R009 threshold (edit distance)
 
 rules:
-  B001: warning
-  R001: error
-  S001: error
+  B001: warning   # downgrade range specifier to warning
+  R003: false     # disable low downloads check entirely
 
 ignore:
   - name: my-internal-package
     ecosystem: npm
-    reason: "Internal fork"
+    reason: "Internal fork, not on public registry"
+  - name: legacy-tool
+    ecosystem: pypi
+    reason: "Approved exception, tracked in JIRA-1234"
 ```
 
-Set a rule to `false` to disable it entirely.
+Set a rule to `false` to disable it entirely. All other rules accept `warning` or `error`.
+
+---
 
 ## Output formats
 
-| Format | Flag | Use case |
+| Format | Flag | Best for |
 |--------|------|----------|
-| Table | `--output table` | Terminal / CI logs |
+| Table (default) | `--output table` | Terminal / CI logs |
 | SARIF | `--output sarif` | GitHub Code Scanning |
-| JSON | `--output json` | Custom integrations |
+| JSON | `--output json` | Custom integrations, dashboards |
+
+---
 
 ## How it works
 
-1. **Parse** — finds all manifest files in the target path
-2. **Fetch** — queries npm, PyPI, crates.io, and GitHub APIs (with disk cache)
-3. **Advise** — checks [OSV.dev](https://osv.dev) for known CVEs
-4. **Evaluate** — runs all enabled rules against each dependency
-5. **Report** — outputs findings in the requested format
+```
+  Your project
+       │
+       ▼
+  1. PARSE ── finds all manifest files (package.json, requirements.txt, Cargo.toml...)
+       │
+       ▼
+  2. FETCH ── queries npm, PyPI, crates.io + GitHub APIs in parallel (10 at a time)
+       │           └── responses cached for 6 hours in .depenemy_cache/
+       ▼
+  3. ADVISE ── checks osv.dev for known CVEs and malicious package history
+       │
+       ▼
+  4. EVALUATE ── runs all enabled rules against each dependency
+       │
+       ▼
+  5. REPORT ── outputs findings in your chosen format
+```
 
-API responses are cached for 6 hours in `.depenemy_cache/` to avoid rate limits on repeated runs.
+API responses are cached for **6 hours** in `.depenemy_cache/` to avoid rate limits on repeated runs. Use `--no-cache` to force fresh data.
+
+---
+
+## GitHub Token
+
+A GitHub token unlocks author account age (R001) and contributor count (R006) checks. Without it, those rules are skipped.
+
+```bash
+# CLI
+depenemy scan . --github-token ghp_xxxx
+
+# Or via environment variable
+GITHUB_TOKEN=ghp_xxxx depenemy scan .
+```
+
+In GitHub Actions, `${{ secrets.GITHUB_TOKEN }}` is available automatically.
+
+---
 
 ## License
 
