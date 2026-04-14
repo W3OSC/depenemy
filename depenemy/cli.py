@@ -179,8 +179,8 @@ def _set_github_outputs(result: object) -> None:
         with open(output_file, "a") as f:
             f.write(f"findings-count={len(result.findings)}\n")
             f.write(f"errors-count={len(result.errors)}\n")
-    except OSError:
-        pass
+    except OSError as exc:
+        console.print(f"[yellow]warning:[/yellow] could not write GitHub Actions outputs: {exc}")
 
 
 if __name__ == "__main__":

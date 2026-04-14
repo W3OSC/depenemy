@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
 from typing import Any, Optional
 
 import httpx
 
 from depenemy import __version__
 from depenemy.cache import Cache
-from depenemy.fetchers.base import BaseFetcher
+from depenemy.fetchers.base import BaseFetcher, parse_date
 from depenemy.types import Dependency, Ecosystem, PackageMetadata
 
 
@@ -49,14 +48,14 @@ class CratesFetcher(BaseFetcher):
         weekly_downloads = crate.get("recent_downloads", 0) or 0
         total_downloads = crate.get("downloads", 0) or 0
         repo_url = crate.get("repository") or None
-        last_published_at = _parse_date(crate.get("updated_at"))
+        last_published_at = parse_date(crate.get("updated_at"))
 
         # Find target version publish date
         versions_data = data.get("versions", [])
         published_at: Optional[datetime] = None
         for v in versions_data:
             if v.get("num") == target:
-                published_at = _parse_date(v.get("created_at"))
+                published_at = parse_date(v.get("created_at"))
                 break
 
         serializable = {
@@ -83,31 +82,14 @@ class CratesFetcher(BaseFetcher):
         )
 
 
-def _parse_date(value: Optional[str]) -> Optional[datetime]:
-    if not value:
-        return None
-    try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-
-
 def _from_cache(data: dict[str, Any], dep: Dependency) -> PackageMetadata:
-    def _parse(v: Optional[str]) -> Optional[datetime]:
-        if not v:
-            return None
-        try:
-            return datetime.fromisoformat(v)
-        except ValueError:
-            return None
-
     return PackageMetadata(
         name=dep.name,
         ecosystem=Ecosystem.CARGO,
         latest_version=data["latest"],
         target_version=data["target"],
-        published_at=_parse(data.get("published_at")),
-        last_published_at=_parse(data.get("last_published_at")),
+        published_at=parse_date(data.get("published_at")),
+        last_published_at=parse_date(data.get("last_published_at")),
         weekly_downloads=data.get("weekly_downloads", 0),
         total_downloads=data.get("total_downloads", 0),
         repository_url=data.get("repo_url"),

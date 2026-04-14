@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
 from typing import Any, Optional
 
 import httpx
 
 from depenemy.cache import Cache
-from depenemy.fetchers.base import BaseFetcher
+from depenemy.fetchers.base import BaseFetcher, parse_date
 from depenemy.types import Dependency, Ecosystem, PackageMetadata
 
 
@@ -74,8 +73,8 @@ class NpmFetcher(BaseFetcher):
 
         # Publish dates
         times = data.get("time", {})
-        published_at = _parse_date(times.get("created"))  # when package was first published
-        last_published_at = _parse_date(times.get(latest))
+        published_at = parse_date(times.get("created"))  # when package was first published
+        last_published_at = parse_date(times.get(latest))
 
         # Maintainers
         maintainers = data.get("maintainers", [])
@@ -158,23 +157,14 @@ async def _parallel_get(
     return results
 
 
-def _parse_date(value: Optional[str]) -> Optional[datetime]:
-    if not value:
-        return None
-    try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-
-
 def _from_cache(data: dict[str, Any], dep: Dependency) -> PackageMetadata:
     return PackageMetadata(
         name=dep.name,
         ecosystem=Ecosystem.NPM,
         latest_version=data["latest"],
         target_version=data["target"],
-        published_at=_parse_date(data.get("published_at")),
-        last_published_at=_parse_date(data.get("last_published_at")),
+        published_at=parse_date(data.get("published_at")),
+        last_published_at=parse_date(data.get("last_published_at")),
         weekly_downloads=data.get("weekly_downloads", 0),
         total_downloads=data.get("total_downloads", 0),
         maintainer_count=data.get("maintainer_count", 0),

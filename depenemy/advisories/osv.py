@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -81,45 +81,6 @@ class OSVAdvisor:
             for a in advisories
         ])
         return advisories
-
-    async def get_patched_version(
-        self,
-        name: str,
-        ecosystem: Ecosystem,
-    ) -> Optional[str]:
-        """Return the minimum patched version across all advisories for a package."""
-        osv_ecosystem = _ECOSYSTEM_MAP.get(ecosystem)
-        if not osv_ecosystem:
-            return None
-
-        cache_key = f"osv:pkg:{osv_ecosystem}:{name}"
-        cached = self._cache.get(cache_key)
-        if cached is not None:
-            return cached.get("patched")  # type: ignore[no-any-return]
-
-        payload = {"package": {"name": name, "ecosystem": osv_ecosystem}}
-        try:
-            resp = await self._client.post(
-                f"{self.API}/query",
-                json=payload,
-                timeout=10,
-            )
-            if resp.status_code != 200:
-                return None
-            data = resp.json()
-        except (httpx.HTTPError, json.JSONDecodeError):
-            return None
-
-        advisories = _parse_osv_response(data)
-        if not advisories:
-            self._cache.set(cache_key, {"patched": None})
-            return None
-
-        # Find the highest patched version
-        patched_versions = [a.patched_version for a in advisories if a.patched_version]
-        result = patched_versions[-1] if patched_versions else None
-        self._cache.set(cache_key, {"patched": result})
-        return result
 
     async def check_malicious(self, name: str, ecosystem: Ecosystem, version: str = "") -> list[Advisory]:
         """Return advisories that describe malicious activity for this package."""

@@ -134,7 +134,10 @@ def load_config(path: Optional[Path] = None) -> Config:
         ]
 
     if "ecosystems" in raw and raw["ecosystems"]:
-        config.ecosystems = [Ecosystem(e) for e in raw["ecosystems"]]
+        config.ecosystems = [
+            Ecosystem(e) for e in raw["ecosystems"]
+            if e in Ecosystem._value2member_map_
+        ]
 
     return config
 

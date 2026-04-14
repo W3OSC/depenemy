@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -29,6 +30,6 @@ class BaseParser(ABC):
                     continue
                 try:
                     results.extend(self.parse(manifest))
-                except Exception:
-                    pass
+                except Exception as exc:
+                    warnings.warn(f"Failed to parse {manifest}: {exc}", RuntimeWarning, stacklevel=2)
         return results

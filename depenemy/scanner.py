@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
 import anyio
 import httpx
@@ -12,10 +12,12 @@ import httpx
 from depenemy.advisories.osv import OSVAdvisor
 from depenemy.cache import Cache
 from depenemy.config import Config
+from depenemy.fetchers.base import parse_date
 from depenemy.fetchers.crates import CratesFetcher
-from depenemy.fetchers.github import GitHubFetcher, parse_github_date
+from depenemy.fetchers.github import GitHubFetcher
 from depenemy.fetchers.npm import NpmFetcher
 from depenemy.fetchers.pypi import PyPIFetcher
+from depenemy.parsers.base import BaseParser
 from depenemy.parsers.npm import NpmParser
 from depenemy.parsers.python import PythonParser
 from depenemy.parsers.rust import RustParser
@@ -98,7 +100,7 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
                 meta.contributor_count = gh_data.get("contributor_count", 0)
                 meta.is_archived = gh_data.get("is_archived", False)
                 if gh_data.get("author_account_created_at"):
-                    meta.author_account_created_at = parse_github_date(
+                    meta.author_account_created_at = parse_date(
                         gh_data["author_account_created_at"]
                     )
 
@@ -142,7 +144,7 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
     )
 
 
-def _get_parsers(config: Config) -> list[Any]:
+def _get_parsers(config: Config) -> list[BaseParser]:
     ecosystems = config.ecosystems
     all_parsers = [NpmParser(), PythonParser(), RustParser()]
     if not ecosystems:

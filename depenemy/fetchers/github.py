@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import datetime
 from typing import Any, Optional
 
 import httpx
@@ -125,10 +124,3 @@ def _parse_github_repo(url: str) -> tuple[Optional[str], Optional[str]]:
     return None, None
 
 
-def parse_github_date(value: Optional[str]) -> Optional[datetime]:
-    if not value:
-        return None
-    try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None

@@ -53,9 +53,9 @@ def print_table(result: ScanResult, console: Console | None = None) -> None:
 
     # Sort: errors first, then warnings, then by rule ID
     def _sort_key(item: tuple[str, list[Finding]]) -> tuple[int, str]:
-        _, findings = item
+        rule_id, findings = item
         worst = max(findings, key=lambda f: _SEVERITY_LEVEL[f.severity])
-        return (-_SEVERITY_LEVEL[worst.severity], item[0])
+        return (-_SEVERITY_LEVEL[worst.severity], rule_id)
 
     sorted_rules = sorted(findings_by_rule.items(), key=_sort_key)
 
