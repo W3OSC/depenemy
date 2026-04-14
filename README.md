@@ -8,6 +8,8 @@
 |____/|_____|_|   |_____|_| \_|_____|_|  |_|  |_|
 </pre>
 
+<img src="assets/banner.svg" alt="depenemy — one of your dependencies might be your enemy" width="680"/>
+
 **Your dependencies could be your enemy.**
 
 Depenemy scans your project for supply chain risks, behavioral issues, and reputation red flags — before they can do damage.
