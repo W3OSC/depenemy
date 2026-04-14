@@ -42,15 +42,14 @@ if _HAS_PYTEST:
             assert finding.rule_id == "B001"
 
         @pytest.mark.parametrize("spec", ["*", "latest"])
-        def test_wildcard_and_latest(self, rule, default_config, spec):
+        def test_wildcard_and_latest_deferred_to_b002(self, rule, default_config, spec):
+            # *, latest, and empty are fully unpinned - B002 owns them, B001 skips to avoid duplicates
             finding = rule.check(make_dep("pkg", spec), make_meta("pkg"), default_config)
-            assert finding is not None
-            assert finding.rule_id == "B001"
+            assert finding is None
 
-        def test_empty_string(self, rule, default_config):
+        def test_empty_string_deferred_to_b002(self, rule, default_config):
             finding = rule.check(make_dep("pkg", ""), make_meta("pkg"), default_config)
-            assert finding is not None
-            assert finding.rule_id == "B001"
+            assert finding is None
 
         @pytest.mark.parametrize("spec", [">=4.0.0", ">3.0.0", "!=1.7.3"])
         def test_comparison_operators(self, rule, default_config, spec):

@@ -33,13 +33,7 @@ class B001RangeSpecifier(BaseRule):
         if spec.startswith("workspace:"):
             return None  # monorepo local package reference, not a registry range
         if spec in ("*", "", "latest"):
-            return self._finding(
-                dep,
-                config,
-                f"`{dep.name}` uses `{spec}` - any version can be installed automatically "
-                f"without your approval. This is how supply chain attacks like axios happen.",
-                actual=spec,
-            )
+            return None  # B002 already covers fully unpinned - avoid duplicate
         if RANGE_PATTERN.search(spec):
             return self._finding(
                 dep,

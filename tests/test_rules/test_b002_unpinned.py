@@ -72,11 +72,12 @@ if _HAS_PYTEST:
     class TestB002VsB001Overlap:
         """Documents which specs trigger both rules vs only one."""
 
-        def test_star_triggers_both(self, default_config):
+        def test_star_triggers_only_b002(self, default_config):
+            # * is fully unpinned - B001 defers to B002 to avoid duplicate findings
             from depenemy.rules.behavioral.b001_range_specifier import B001RangeSpecifier
             dep = make_dep("pkg", "*")
             meta = make_meta("pkg")
-            assert B001RangeSpecifier().check(dep, meta, default_config) is not None
+            assert B001RangeSpecifier().check(dep, meta, default_config) is None
             assert B002Unpinned().check(dep, meta, default_config) is not None
 
         def test_caret_triggers_only_b001(self, default_config):

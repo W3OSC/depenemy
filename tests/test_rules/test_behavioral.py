@@ -30,8 +30,9 @@ class TestB001RangeSpecifier(unittest.TestCase):
     def test_flags_tilde(self) -> None:
         self.assertIsNotNone(self.rule.check(_dep("~1.2.3"), self.meta, self.cfg))
 
-    def test_flags_wildcard(self) -> None:
-        self.assertIsNotNone(self.rule.check(_dep("*"), self.meta, self.cfg))
+    def test_skips_wildcard(self) -> None:
+        # * is covered by B002 (unpinned), B001 should not duplicate it
+        self.assertIsNone(self.rule.check(_dep("*"), self.meta, self.cfg))
 
     def test_flags_gte(self) -> None:
         self.assertIsNotNone(self.rule.check(_dep(">=1.0.0"), self.meta, self.cfg))
