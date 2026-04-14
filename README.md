@@ -183,24 +183,7 @@ Set a rule to `false` to disable it entirely. All other rules accept `warning` o
 
 ## How it works
 
-```
-  Your project
-       │
-       ▼
-  1. PARSE ── finds all manifest files (package.json, requirements.txt, Cargo.toml...)
-       │
-       ▼
-  2. FETCH ── queries npm, PyPI, crates.io + GitHub APIs in parallel (10 at a time)
-       │           └── responses cached for 6 hours in .depenemy_cache/
-       ▼
-  3. ADVISE ── checks osv.dev for known CVEs and malicious package history
-       │
-       ▼
-  4. EVALUATE ── runs all enabled rules against each dependency
-       │
-       ▼
-  5. REPORT ── outputs findings in your chosen format
-```
+<img src="assets/image.png" alt="depenemy architecture" width="520"/>
 
 API responses are cached for **6 hours** in `.depenemy_cache/` to avoid rate limits on repeated runs. Use `--no-cache` to force fresh data.
 
