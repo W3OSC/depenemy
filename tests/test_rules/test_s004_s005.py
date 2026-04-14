@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
 
+from depenemy.advisories.osv import MaliciousAdvisoryChecker
 from depenemy.config import Config
 from depenemy.rules.supply_chain.s004_dependency_confusion import S004DependencyConfusion
 from depenemy.rules.supply_chain.s005_malicious_package import S005MaliciousPackage
@@ -159,6 +161,70 @@ class TestS005MaliciousPackage(unittest.TestCase):
                      patched_version="", description="Bad."),
         ]
         self.assertIsNone(self.rule.check(dep, meta, config))  # type: ignore[arg-type]
+
+
+class TestMaliciousAdvisoryCheckerVersionScoping(unittest.IsolatedAsyncioTestCase):
+    """Verify MaliciousAdvisoryChecker passes version to OSV so only affected versions fire."""
+
+    def _make_checker(self, response_vulns: list) -> tuple[MaliciousAdvisoryChecker, MagicMock]:
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"vulns": response_vulns}
+
+        mock_client = MagicMock()
+        mock_client.post = AsyncMock(return_value=mock_resp)
+
+        mock_cache = MagicMock()
+        mock_cache.get.return_value = None
+        mock_cache.set.return_value = None
+
+        advisor = MagicMock()
+        advisor._client = mock_client
+        advisor._cache = mock_cache
+        advisor.API = "https://api.osv.dev/v1"
+
+        return MaliciousAdvisoryChecker(advisor), mock_client
+
+    async def test_version_included_in_osv_payload(self) -> None:
+        """When a version is given, it must be sent in the OSV query payload."""
+        checker, mock_client = self._make_checker([])
+        await checker.check("event-stream", Ecosystem.NPM, version="3.3.6")
+
+        call_kwargs = mock_client.post.call_args
+        payload = call_kwargs[1]["json"] if "json" in call_kwargs[1] else call_kwargs[0][1]
+        self.assertEqual(payload.get("version"), "3.3.6")
+
+    async def test_no_version_omits_version_from_payload(self) -> None:
+        """When no version is given, the payload must not include a version key."""
+        checker, mock_client = self._make_checker([])
+        await checker.check("event-stream", Ecosystem.NPM, version="")
+
+        call_kwargs = mock_client.post.call_args
+        payload = call_kwargs[1]["json"] if "json" in call_kwargs[1] else call_kwargs[0][1]
+        self.assertNotIn("version", payload)
+
+    async def test_malicious_advisory_returned_for_affected_version(self) -> None:
+        """A package with a malicious advisory for the queried version triggers a finding."""
+        vuln = {
+            "id": "MAL-2024-123",
+            "summary": "published with malicious code that exfiltrates env vars",
+            "details": "",
+        }
+        checker, _ = self._make_checker([vuln])
+        results = await checker.check("evil-pkg", Ecosystem.NPM, version="3.3.6")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, "MAL-2024-123")
+
+    async def test_non_malicious_advisory_not_returned(self) -> None:
+        """A regular CVE advisory (no malicious phrases) must not be returned."""
+        vuln = {
+            "id": "CVE-2024-9999",
+            "summary": "Remote code execution via buffer overflow",
+            "details": "",
+        }
+        checker, _ = self._make_checker([vuln])
+        results = await checker.check("some-pkg", Ecosystem.NPM, version="1.0.0")
+        self.assertEqual(len(results), 0)
 
 
 if __name__ == "__main__":

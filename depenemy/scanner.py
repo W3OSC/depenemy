@@ -110,9 +110,9 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
                         dep.name, target, dep.ecosystem
                     )
 
-                # Check for malicious activity history
+                # Check for malicious activity history (version-scoped)
                 meta.malicious_advisories = await malicious_checker.check(
-                    dep.name, dep.ecosystem
+                    dep.name, dep.ecosystem, version=target or ""
                 )
 
                 metadata_map[(dep.name, dep.ecosystem.value)] = meta

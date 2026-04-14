@@ -129,17 +129,19 @@ class MaliciousAdvisoryChecker:
     def __init__(self, advisor: OSVAdvisor) -> None:
         self._advisor = advisor
 
-    async def check(self, name: str, ecosystem: Ecosystem) -> list[Advisory]:
+    async def check(self, name: str, ecosystem: Ecosystem, version: str = "") -> list[Advisory]:
         osv_ecosystem = _ECOSYSTEM_MAP.get(ecosystem)
         if not osv_ecosystem:
             return []
 
-        cache_key = f"osv:mal:{osv_ecosystem}:{name}"
+        cache_key = f"osv:mal:{osv_ecosystem}:{name}:{version}"
         cached = self._advisor._cache.get(cache_key)
         if cached is not None:
             return [Advisory(**a) for a in cached]
 
-        payload = {"package": {"name": name, "ecosystem": osv_ecosystem}}
+        payload: dict[str, Any] = {"package": {"name": name, "ecosystem": osv_ecosystem}}
+        if version:
+            payload["version"] = version
         try:
             resp = await self._advisor._client.post(
                 f"{self._advisor.API}/query",
