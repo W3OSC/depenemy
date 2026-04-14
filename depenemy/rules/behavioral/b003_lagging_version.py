@@ -6,23 +6,10 @@ import re
 from typing import Optional
 
 from depenemy.config import Config
-from depenemy.rules.base import BaseRule
+from depenemy.rules.base import BaseRule, parse_semver
 from depenemy.types import Dependency, Finding, PackageMetadata
 
 _RANGE_PATTERN = re.compile(r"[\^~*]|>=|<=|>|!=|\|\|")
-
-
-def _parse_ver(v: str) -> tuple[int, int, int]:
-    try:
-        parts = v.strip().lstrip("v").split(".")[:3]
-        nums = []
-        for p in parts:
-            nums.append(int(p.split("-")[0].split("+")[0]))
-        while len(nums) < 3:
-            nums.append(0)
-        return (nums[0], nums[1], nums[2])
-    except (ValueError, AttributeError):
-        return (0, 0, 0)
 
 
 class B003LaggingVersion(BaseRule):
@@ -41,8 +28,8 @@ class B003LaggingVersion(BaseRule):
         spec = dep.version_spec.strip()
         if spec in ("*", "", "latest") or _RANGE_PATTERN.search(spec):
             return None  # B001 already flags range specifiers; lag is meaningless without a pinned version
-        target = _parse_ver(meta.target_version)
-        latest = _parse_ver(meta.latest_version)
+        target = parse_semver(meta.target_version)
+        latest = parse_semver(meta.latest_version)
 
         if latest <= target:
             return None

@@ -13,6 +13,9 @@ from depenemy.fetchers.base import BaseFetcher
 from depenemy.types import Dependency, Ecosystem, PackageMetadata
 
 
+_NPM_ALL_TIME_RANGE = "2010-01-01:2099-12-31"  # npm has no "all-time" endpoint; this covers all published packages
+
+
 class NpmFetcher(BaseFetcher):
     ecosystem = Ecosystem.NPM
 
@@ -122,7 +125,7 @@ class NpmFetcher(BaseFetcher):
             weekly_resp, total_resp = await _parallel_get(
                 self._client,
                 f"{self.DOWNLOADS_API}/last-week/{name}",
-                f"{self.DOWNLOADS_API}/2010-01-01:2099-12-31/{name}",
+                f"{self.DOWNLOADS_API}/{_NPM_ALL_TIME_RANGE}/{name}",
             )
             weekly = weekly_resp.get("downloads", 0) if weekly_resp else 0
             total = total_resp.get("downloads", 0) if total_resp else 0

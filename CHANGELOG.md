@@ -13,11 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial release
 - npm and PyPI ecosystem support
 - Behavioral checks: range specifiers, unpinned versions, lagging versions
-- Reputation checks: author age, package age, download counts, contributors, staleness
-- Supply chain checks: install scripts, missing source repo, archived repo, dependency confusion
-- Compliance checks: restrictive licenses, missing license
-- Quality checks: single maintainer
-- Typosquatting detection via Levenshtein distance
+- Reputation checks: author age, package age, download counts, contributors, staleness, known CVEs, deprecated packages, typosquatting
+- Supply chain checks: install scripts, missing source repo, archived repo, dependency confusion, known malicious packages
 - Deprecated package detection
 - OSV.dev integration for security advisories
 - SARIF 2.1.0 output (GitHub Code Scanning compatible)

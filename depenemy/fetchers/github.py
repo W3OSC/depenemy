@@ -114,15 +114,14 @@ class GitHubFetcher:
         return None
 
 
+_GITHUB_REPO_RE = re.compile(r"github\.com[:/]([^/]+)/([^/.\s]+?)(?:\.git)?$")
+
+
 def _parse_github_repo(url: str) -> tuple[Optional[str], Optional[str]]:
     """Extract (owner, repo) from a GitHub URL."""
-    patterns = [
-        r"github\.com[:/]([^/]+)/([^/.\s]+?)(?:\.git)?$",
-    ]
-    for pattern in patterns:
-        m = re.search(pattern, url)
-        if m:
-            return m.group(1), m.group(2)
+    m = _GITHUB_REPO_RE.search(url)
+    if m:
+        return m.group(1), m.group(2)
     return None, None
 
 

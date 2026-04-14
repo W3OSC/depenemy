@@ -90,25 +90,25 @@ def load_config(path: Optional[Path] = None) -> Config:
     if config_path is None or not config_path.exists():
         return Config()
 
-    with open(config_path) as f:
-        content = f.read()
     if not _HAS_YAML:
         return Config()
-    raw = _yaml.safe_load(content) or {}
+    with open(config_path) as f:
+        raw = _yaml.safe_load(f) or {}
 
     config = Config()
 
     if "thresholds" in raw:
         t = raw["thresholds"]
+        defaults = Thresholds()
         thresholds = Thresholds(
-            min_weekly_downloads=t.get("min_weekly_downloads", 1000),
-            min_total_downloads=t.get("min_total_downloads", 10000),
-            min_author_account_age_days=t.get("min_author_account_age_days", 365),
-            min_package_age_days=t.get("min_package_age_days", 180),
-            max_stale_days=t.get("max_stale_days", 730),
-            min_contributors=t.get("min_contributors", 5),
-            max_version_lag=t.get("max_version_lag", 5),
-            typosquatting_distance=t.get("typosquatting_distance", 2),
+            min_weekly_downloads=t.get("min_weekly_downloads", defaults.min_weekly_downloads),
+            min_total_downloads=t.get("min_total_downloads", defaults.min_total_downloads),
+            min_author_account_age_days=t.get("min_author_account_age_days", defaults.min_author_account_age_days),
+            min_package_age_days=t.get("min_package_age_days", defaults.min_package_age_days),
+            max_stale_days=t.get("max_stale_days", defaults.max_stale_days),
+            min_contributors=t.get("min_contributors", defaults.min_contributors),
+            max_version_lag=t.get("max_version_lag", defaults.max_version_lag),
+            typosquatting_distance=t.get("typosquatting_distance", defaults.typosquatting_distance),
         )
         config.thresholds = thresholds
 

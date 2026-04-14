@@ -117,7 +117,7 @@ def _parse_pipfile(path: Path) -> list[Dependency]:
     try:
         with open(path, "rb") as f:
             data = tomllib.load(f)
-    except Exception:
+    except (OSError, tomllib.TOMLDecodeError):
         return deps
 
     lines = path.read_text().splitlines()
@@ -146,7 +146,8 @@ def _split_pep508(dep_str: str) -> tuple[str, str]:
 
 
 def _find_line(lines: list[str], name: str) -> int:
+    pattern = re.compile(r"(?<![A-Za-z0-9_-])" + re.escape(name) + r"(?![A-Za-z0-9_-])")
     for i, line in enumerate(lines, start=1):
-        if name in line:
+        if pattern.search(line):
             return i
     return 1

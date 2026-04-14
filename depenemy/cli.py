@@ -16,7 +16,7 @@ from depenemy import __version__
 from depenemy.config import load_config
 from depenemy.rules import ALL_RULES
 from depenemy.scanner import scan
-from depenemy.types import Severity
+from depenemy.types import Ecosystem, Severity
 
 app = typer.Typer(
     name="depenemy",
@@ -65,6 +65,10 @@ def cmd_scan(
     github_token: Optional[str] = typer.Option(
         None, "--github-token", envvar="GITHUB_TOKEN", help="GitHub token for API calls."
     ),
+    ecosystem: Optional[str] = typer.Option(
+        None, "--ecosystem", "-e",
+        help="Comma-separated ecosystems to scan (npm,pypi,cargo). Default: auto-detect all.",
+    ),
 ) -> None:
     """Scan dependencies for supply chain risks, reputation issues, and behavioral problems."""
     if not paths:
@@ -79,6 +83,12 @@ def cmd_scan(
     config.no_cache = no_cache
     if github_token:
         config.github_token = github_token
+    if ecosystem:
+        try:
+            config.ecosystems = [Ecosystem(e.strip()) for e in ecosystem.split(",") if e.strip()]
+        except ValueError as exc:
+            console.print(f"[red]error:[/red] unknown ecosystem: {exc}")
+            raise typer.Exit(1)
 
     console.print(f"\n[bold]depenemy[/bold] v{__version__} - scanning {len(paths)} path(s)...\n")
 

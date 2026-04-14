@@ -9,7 +9,7 @@ from typing import Any, Optional
 import anyio
 import httpx
 
-from depenemy.advisories.osv import MaliciousAdvisoryChecker, OSVAdvisor
+from depenemy.advisories.osv import OSVAdvisor
 from depenemy.cache import Cache
 from depenemy.config import Config
 from depenemy.fetchers.crates import CratesFetcher
@@ -69,7 +69,6 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
         crates_fetcher = CratesFetcher(client, cache)
         github_fetcher = GitHubFetcher(client, cache, token=token)
         osv_advisor = OSVAdvisor(client, cache)
-        malicious_checker = MaliciousAdvisoryChecker(osv_advisor)
 
         metadata_map: dict[tuple[str, str], PackageMetadata] = {}
 
@@ -111,7 +110,7 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
                     )
 
                 # Check for malicious activity history (version-scoped)
-                meta.malicious_advisories = await malicious_checker.check(
+                meta.malicious_advisories = await osv_advisor.check_malicious(
                     dep.name, dep.ecosystem, version=target or ""
                 )
 

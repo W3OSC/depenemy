@@ -1,24 +1,13 @@
 """Parser for Solidity projects.
 
-Hardhat projects are pure npm - the NpmParser handles them automatically.
-Foundry projects declare Solidity dependencies in foundry.toml but install
-them via git submodules, not a public registry. We delegate npm detection
-to NpmParser and note that foundry.toml deps are out of scope for registry
-lookups (no public registry to query).
+Hardhat and Foundry projects manage their npm/JS tooling via package.json.
+Foundry Solidity dependencies are git submodules with no public registry -
+there is nothing to scan for them. We delegate entirely to NpmParser.
 """
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    try:
-        import tomllib  # type: ignore[no-redef]
-    except ImportError:
-        import tomli as tomllib  # type: ignore[no-redef,import-untyped]
 
 from depenemy.parsers.base import BaseParser
 from depenemy.parsers.npm import NpmParser
@@ -35,27 +24,9 @@ class SolidityParser(BaseParser):
         self._npm_parser = NpmParser()
 
     def parse(self, path: Path) -> list[Dependency]:
-        """Parse foundry.toml and also scan the project root for package.json."""
-        deps: list[Dependency] = []
-
-        # Check for adjacent package.json (Hardhat or npm-based tooling)
-        pkg_json = path.parent / "package.json"
-        if pkg_json.exists():
-            deps.extend(self._npm_parser.parse(pkg_json))
-
-        # Parse foundry remappings - informational only, no registry to check
-        try:
-            with open(path, "rb") as f:
-                data = tomllib.load(f)
-            remappings = data.get("profile", {}).get("default", {}).get("remappings", [])
-            for remap in remappings:
-                # Remappings are git submodules, not registry packages - skip
-                _ = remap
-        except (OSError, tomllib.TOMLDecodeError):
-            pass
-
-        return deps
+        # foundry.toml remappings are git submodules, not registry packages.
+        # Any npm tooling is picked up by find_and_parse via NpmParser.
+        return []
 
     def find_and_parse(self, root: Path) -> list[Dependency]:
-        """For Solidity projects, primarily delegate to NpmParser."""
         return self._npm_parser.find_and_parse(root)

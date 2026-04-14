@@ -24,7 +24,7 @@ def generate_sarif(result: ScanResult) -> dict[str, Any]:
             "name": rule.name,
             "shortDescription": {"text": rule.name},
             "fullDescription": {"text": rule.description},
-            "helpUri": f"https://github.com/W3OSC/depenemy/blob/main/docs/rules/{rule.id.lower()}.md",
+            "helpUri": "https://github.com/W3OSC/depenemy",
             "properties": {"tags": ["supply-chain", "security"]},
         }
         for rule in ALL_RULES

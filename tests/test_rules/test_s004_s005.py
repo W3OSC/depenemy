@@ -4,7 +4,7 @@ from __future__ import annotations
 import unittest
 from unittest.mock import AsyncMock, MagicMock
 
-from depenemy.advisories.osv import MaliciousAdvisoryChecker
+from depenemy.advisories.osv import OSVAdvisor
 from depenemy.config import Config
 from depenemy.rules.supply_chain.s004_dependency_confusion import S004DependencyConfusion
 from depenemy.rules.supply_chain.s005_malicious_package import S005MaliciousPackage
@@ -163,10 +163,10 @@ class TestS005MaliciousPackage(unittest.TestCase):
         self.assertIsNone(self.rule.check(dep, meta, config))  # type: ignore[arg-type]
 
 
-class TestMaliciousAdvisoryCheckerVersionScoping(unittest.IsolatedAsyncioTestCase):
-    """Verify MaliciousAdvisoryChecker passes version to OSV so only affected versions fire."""
+class TestOSVAdvisorCheckMaliciousVersionScoping(unittest.IsolatedAsyncioTestCase):
+    """Verify OSVAdvisor.check_malicious passes version to OSV so only affected versions fire."""
 
-    def _make_checker(self, response_vulns: list) -> tuple[MaliciousAdvisoryChecker, MagicMock]:
+    def _make_advisor(self, response_vulns: list) -> tuple[OSVAdvisor, MagicMock]:
         mock_resp = MagicMock()
         mock_resp.status_code = 200
         mock_resp.json.return_value = {"vulns": response_vulns}
@@ -178,17 +178,13 @@ class TestMaliciousAdvisoryCheckerVersionScoping(unittest.IsolatedAsyncioTestCas
         mock_cache.get.return_value = None
         mock_cache.set.return_value = None
 
-        advisor = MagicMock()
-        advisor._client = mock_client
-        advisor._cache = mock_cache
-        advisor.API = "https://api.osv.dev/v1"
-
-        return MaliciousAdvisoryChecker(advisor), mock_client
+        advisor = OSVAdvisor(mock_client, mock_cache)
+        return advisor, mock_client
 
     async def test_version_included_in_osv_payload(self) -> None:
         """When a version is given, it must be sent in the OSV query payload."""
-        checker, mock_client = self._make_checker([])
-        await checker.check("event-stream", Ecosystem.NPM, version="3.3.6")
+        advisor, mock_client = self._make_advisor([])
+        await advisor.check_malicious("event-stream", Ecosystem.NPM, version="3.3.6")
 
         call_kwargs = mock_client.post.call_args
         payload = call_kwargs[1]["json"] if "json" in call_kwargs[1] else call_kwargs[0][1]
@@ -196,8 +192,8 @@ class TestMaliciousAdvisoryCheckerVersionScoping(unittest.IsolatedAsyncioTestCas
 
     async def test_no_version_omits_version_from_payload(self) -> None:
         """When no version is given, the payload must not include a version key."""
-        checker, mock_client = self._make_checker([])
-        await checker.check("event-stream", Ecosystem.NPM, version="")
+        advisor, mock_client = self._make_advisor([])
+        await advisor.check_malicious("event-stream", Ecosystem.NPM, version="")
 
         call_kwargs = mock_client.post.call_args
         payload = call_kwargs[1]["json"] if "json" in call_kwargs[1] else call_kwargs[0][1]
@@ -210,8 +206,8 @@ class TestMaliciousAdvisoryCheckerVersionScoping(unittest.IsolatedAsyncioTestCas
             "summary": "published with malicious code that exfiltrates env vars",
             "details": "",
         }
-        checker, _ = self._make_checker([vuln])
-        results = await checker.check("evil-pkg", Ecosystem.NPM, version="3.3.6")
+        advisor, _ = self._make_advisor([vuln])
+        results = await advisor.check_malicious("evil-pkg", Ecosystem.NPM, version="3.3.6")
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, "MAL-2024-123")
 
@@ -222,8 +218,8 @@ class TestMaliciousAdvisoryCheckerVersionScoping(unittest.IsolatedAsyncioTestCas
             "summary": "Remote code execution via buffer overflow",
             "details": "",
         }
-        checker, _ = self._make_checker([vuln])
-        results = await checker.check("some-pkg", Ecosystem.NPM, version="1.0.0")
+        advisor, _ = self._make_advisor([vuln])
+        results = await advisor.check_malicious("some-pkg", Ecosystem.NPM, version="1.0.0")
         self.assertEqual(len(results), 0)
 
 

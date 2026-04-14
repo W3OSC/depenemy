@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -61,7 +62,8 @@ class RustParser(BaseParser):
 
 
 def _find_line(lines: list[str], name: str) -> int:
+    pattern = re.compile(r"(?<![A-Za-z0-9_-])" + re.escape(name) + r"(?![A-Za-z0-9_-])")
     for i, line in enumerate(lines, start=1):
-        if name in line:
+        if pattern.search(line):
             return i
     return 1

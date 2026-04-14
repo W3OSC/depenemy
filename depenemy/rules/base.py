@@ -9,6 +9,18 @@ from depenemy.config import Config
 from depenemy.types import Dependency, Finding, PackageMetadata, Severity
 
 
+def parse_semver(v: str) -> tuple[int, int, int]:
+    """Parse a semver string into a (major, minor, patch) tuple. Returns (0,0,0) on failure."""
+    try:
+        parts = v.strip().lstrip("v").split(".")[:3]
+        nums = [int(p.split("-")[0].split("+")[0]) for p in parts]
+        while len(nums) < 3:
+            nums.append(0)
+        return (nums[0], nums[1], nums[2])
+    except (ValueError, AttributeError):
+        return (0, 0, 0)
+
+
 class BaseRule(ABC):
     id: str
     name: str

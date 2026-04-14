@@ -17,6 +17,23 @@ _ECOSYSTEM_MAP = {
     Ecosystem.CARGO: "crates.io",
 }
 
+_MALICIOUS_PHRASES = [
+    "published with malicious code",
+    "embedded malicious code",
+    "including malicious code",
+    "malicious code was introduced",
+    "malicious code was added",
+    "malicious code that was introduced",
+    "considered malicious",
+    "malicious actor added this package",
+    "malicious npm package",
+    "malicious pypi package",
+    "package was compromised",
+    "account was compromised",
+    "backdoor",
+    "supply chain attack on",
+]
+
 
 class OSVAdvisor:
     API = "https://api.osv.dev/v1"
@@ -104,38 +121,14 @@ class OSVAdvisor:
         self._cache.set(cache_key, {"patched": result})
         return result
 
-
-_MALICIOUS_PHRASES = [
-    "published with malicious code",
-    "embedded malicious code",
-    "including malicious code",
-    "malicious code was introduced",
-    "malicious code was added",
-    "malicious code that was introduced",
-    "considered malicious",
-    "malicious actor added this package",
-    "malicious npm package",
-    "malicious pypi package",
-    "package was compromised",
-    "account was compromised",
-    "backdoor",
-    "supply chain attack on",
-]
-
-
-class MaliciousAdvisoryChecker:
-    """Checks if a package has any history of malicious activity in OSV."""
-
-    def __init__(self, advisor: OSVAdvisor) -> None:
-        self._advisor = advisor
-
-    async def check(self, name: str, ecosystem: Ecosystem, version: str = "") -> list[Advisory]:
+    async def check_malicious(self, name: str, ecosystem: Ecosystem, version: str = "") -> list[Advisory]:
+        """Return advisories that describe malicious activity for this package."""
         osv_ecosystem = _ECOSYSTEM_MAP.get(ecosystem)
         if not osv_ecosystem:
             return []
 
         cache_key = f"osv:mal:{osv_ecosystem}:{name}:{version}"
-        cached = self._advisor._cache.get(cache_key)
+        cached = self._cache.get(cache_key)
         if cached is not None:
             return [Advisory(**a) for a in cached]
 
@@ -143,8 +136,8 @@ class MaliciousAdvisoryChecker:
         if version:
             payload["version"] = version
         try:
-            resp = await self._advisor._client.post(
-                f"{self._advisor.API}/query",
+            resp = await self._client.post(
+                f"{self.API}/query",
                 json=payload,
                 timeout=10,
             )
@@ -175,7 +168,7 @@ class MaliciousAdvisoryChecker:
              "patched_version": a.patched_version, "description": a.description, "source": a.source}
             for a in results
         ]
-        self._advisor._cache.set(cache_key, serializable)
+        self._cache.set(cache_key, serializable)
         return results
 
 
