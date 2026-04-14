@@ -122,7 +122,8 @@ def _print_summary(result: ScanResult, console: Console) -> None:
     console.print()
 
     summary = Text("  ")
-    summary.append(f"{len(result.dependencies)} packages scanned", style="bold")
+    pkg_label = f"package{'s' if len(result.dependencies) != 1 else ''}"
+    summary.append(f"{len(result.dependencies)} {pkg_label} scanned", style="bold")
     summary.append("   ", style="")
 
     if errors:

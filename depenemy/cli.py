@@ -92,7 +92,7 @@ def cmd_scan(
             print_table(result, console=out_console)
         else:
             print_table(result, console=console)
-            console.print(f"[bright_black]Full results → [bold]depenemy-results.json[/bold][/bright_black]\n")
+            console.print("[bright_black]Full results → [bold]depenemy-results.json[/bold][/bright_black]\n")
 
     elif output == OutputFormat.sarif:
         from depenemy.reporters.sarif import generate_sarif, write_sarif
