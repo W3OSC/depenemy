@@ -183,7 +183,7 @@ Set a rule to `false` to disable it entirely. All other rules accept `warning` o
 
 ## How it works
 
-<img src="assets/image.png" alt="depenemy architecture" width="520"/>
+<img width="619" height="813" alt="image" src="https://github.com/user-attachments/assets/07a028e4-5c1f-402e-804e-c9e63148d0aa" />
 
 API responses are cached for **6 hours** in `.depenemy_cache/` to avoid rate limits on repeated runs. Use `--no-cache` to force fresh data.
 
