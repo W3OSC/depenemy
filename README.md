@@ -106,33 +106,8 @@ depenemy rules
 ```
 
 **Example output:**
+<img width="995" height="754" alt="image" src="https://github.com/user-attachments/assets/ce989d4f-54f1-4a3c-9a94-46fab88974a5" />
 
-```
-────────────────────────── depenemy ──────────────────────────
-
- ERROR  S005  Known malicious package  ·  1 package
-     This package has a recorded history of malicious activity in OSV.
-
-     event-stream  npm  malicious activity recorded
-
- ERROR  R007  Known vulnerable version  ·  1 package
-     The target version is older than a version released to fix a known vulnerability.
-
-     lodash        npm  4.17.4 [high CVE]  ->  4.17.21
-
- WARNING  B001  Range specifier  ·  3 packages
-     Dependency uses a version range instead of an exact pin.
-
-     axios         npm  ^1.4.0
-     express       npm  ^4.18.0
-     react         npm  ^18.0.0
-
-──────────────────────────────────────────────────────────────
-
-  42 packages scanned   2 errors   1 warning
-
-Full results -> depenemy-results.json
-```
 
 ---
 
