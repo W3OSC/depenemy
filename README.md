@@ -1,32 +1,7 @@
 <div align="center">
 
 <img src="assets/logos/logo.svg" alt="depenemy" width="380"/>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 100" width="320" height="100">
-  <!-- Background -->
-  <rect width="320" height="100" rx="14" fill="#0d1117"/>
 
-  <!-- "dep" in white -->
-  <text x="26" y="68"
-    font-family="'Courier New', Courier, monospace"
-    font-size="52"
-    font-weight="700"
-    fill="#ecf0f1"
-    letter-spacing="-1">dep</text>
-
-  <!-- "enemy" in red -->
-  <text x="126" y="68"
-    font-family="'Courier New', Courier, monospace"
-    font-size="52"
-    font-weight="700"
-    fill="#e74c3c"
-    letter-spacing="-1">enemy</text>
-
-  <!-- Underline accent under "enemy" -->
-  <rect x="126" y="74" width="169" height="3" rx="1.5" fill="#c0392b"/>
-
-  <!-- Small dot separator -->
-  <circle cx="118" cy="66" r="3.5" fill="#555"/>
-</svg>
 **Your dependencies could be your enemy.**
 
 Depenemy scans your project for supply chain risks, behavioral issues, and reputation red flags - before they can do damage.
