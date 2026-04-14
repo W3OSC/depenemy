@@ -19,7 +19,12 @@ def _dep(name: str = "test-pkg") -> Dependency:
     )
 
 
-def _finding(rule_id: str = "B001", severity: Severity = Severity.ERROR, name: str = "test-pkg", actual: str = "^1.0.0") -> Finding:
+def _finding(
+    rule_id: str = "B001",
+    severity: Severity = Severity.ERROR,
+    name: str = "test-pkg",
+    actual: str = "^1.0.0",
+) -> Finding:
     dep = _dep(name)
     return Finding(
         rule_id=rule_id,
