@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import unittest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 from depenemy.advisories.osv import MaliciousAdvisoryChecker
 from depenemy.config import Config
