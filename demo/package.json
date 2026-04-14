@@ -1,0 +1,17 @@
+{
+  "name": "demo-vulnerable-project",
+  "version": "1.0.0",
+  "description": "Demo project — intentionally vulnerable dependencies for depenemy showcase",
+  "dependencies": {
+    "lodash": "4.17.4",
+    "request": "2.88.2",
+    "express": "3.0.0",
+    "axios": "^1.4.0",
+    "react": "*",
+    "moment": "^2.29.1",
+    "esbuild": "0.10.0",
+    "colors": "1.4.0",
+    "node-fetch": "2.6.0",
+    "minimist": "0.0.8"
+  }
+}

@@ -31,21 +31,21 @@ Depenemy gives you **a single command** that audits all your dependencies across
 |----|------|-------------|----------|
 | B001 | Range specifier | Version uses `^`, `~`, `>=`, `*` - allows unexpected updates | Warning |
 | B002 | No version pinned | No version specified at all | Error |
-| B003 | Lagging version | Pinned version is significantly behind latest | Error |
+| B003 | Lagging version | Pinned version is significantly behind latest | Warning |
 
 ### Reputation signals
 
 | ID | Name | Description | Severity |
 |----|------|-------------|----------|
-| R001 | Young author account | Package author's GitHub account is < 12 months old | Error |
-| R002 | New package | Package was first published < 6 months ago | Error |
-| R003 | Low weekly downloads | < 1,000 weekly downloads | Error |
-| R004 | Low total downloads | < 10,000 total downloads | Error |
-| R005 | No updates in 2+ years | Last publish was over 2 years ago | Error |
-| R006 | Few contributors | Fewer than 5 contributors on GitHub | Error |
+| R001 | Young author account | Package author's GitHub account is < 12 months old | Warning |
+| R002 | New package | Package was first published < 6 months ago | Warning |
+| R003 | Low weekly downloads | < 1,000 weekly downloads | Warning |
+| R004 | Low total downloads | < 10,000 total downloads | Warning |
+| R005 | No updates in 2+ years | Last publish was over 2 years ago | Warning |
+| R006 | Few contributors | Fewer than 5 contributors on GitHub | Warning |
 | R007 | Known vulnerable version | Your version is below a known security patch (OSV/CVE) | Error |
-| R008 | Deprecated package | Package is officially marked as deprecated | Error |
-| R009 | Typosquatting suspected | Name is suspiciously close to a popular package | Error |
+| R008 | Deprecated package | Package is officially marked as deprecated | Warning |
+| R009 | Typosquatting suspected | Name is suspiciously close to a popular package | Warning |
 
 ### Supply chain risks
 
@@ -53,8 +53,8 @@ Depenemy gives you **a single command** that audits all your dependencies across
 |----|------|-------------|----------|
 | S001 | Install scripts | Package runs code at install time (`postinstall`, `preinstall`) | Error |
 | S002 | No source repository | No GitHub/GitLab link in package metadata | Warning |
-| S003 | Archived repository | Source repo has been archived or deleted | Error |
-| S004 | Dependency confusion | Private package name found on public registry | Error |
+| S003 | Archived repository | Source repo has been archived or deleted | Warning |
+| S004 | Dependency confusion | Private package name found on public registry | Warning |
 | S005 | Known malicious package | Package has a recorded history of malicious activity (OSV) | Error |
 
 ---

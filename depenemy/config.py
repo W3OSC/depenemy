@@ -35,23 +35,26 @@ class Thresholds:
 
 
 DEFAULT_RULES: dict[str, Severity] = {
-    "B001": Severity.WARNING,
-    "B002": Severity.ERROR,
-    "B003": Severity.ERROR,
-    "R001": Severity.ERROR,
-    "R002": Severity.ERROR,
-    "R003": Severity.ERROR,
-    "R004": Severity.ERROR,
-    "R005": Severity.ERROR,
-    "R006": Severity.ERROR,
-    "R007": Severity.ERROR,
-    "R008": Severity.ERROR,
-    "R009": Severity.ERROR,
-    "S001": Severity.ERROR,
-    "S002": Severity.WARNING,
-    "S003": Severity.ERROR,
-    "S004": Severity.ERROR,
-    "S005": Severity.ERROR,
+    # Behavioral
+    "B001": Severity.WARNING,  # range specifier - hygiene
+    "B002": Severity.ERROR,    # completely unpinned - active risk
+    "B003": Severity.WARNING,  # lagging version - hygiene, CVEs caught by R007
+    # Reputation
+    "R001": Severity.WARNING,  # young author - signal, not proof
+    "R002": Severity.WARNING,  # new package - signal, not proof
+    "R003": Severity.WARNING,  # low weekly downloads - signal
+    "R004": Severity.WARNING,  # low total downloads - signal
+    "R005": Severity.WARNING,  # stale - maintenance issue, not active threat
+    "R006": Severity.WARNING,  # few contributors - signal
+    "R007": Severity.ERROR,    # known CVE - active security threat
+    "R008": Severity.WARNING,  # deprecated - should migrate, not urgent
+    "R009": Severity.WARNING,  # typosquatting suspected - signal
+    # Supply chain
+    "S001": Severity.ERROR,    # install scripts - executes code on install
+    "S002": Severity.WARNING,  # no source repo - hygiene
+    "S003": Severity.WARNING,  # archived repo - maintenance issue
+    "S004": Severity.WARNING,  # dependency confusion - signal
+    "S005": Severity.ERROR,    # known malicious - active security threat
 }
 
 
