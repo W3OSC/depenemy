@@ -8,6 +8,7 @@ from typing import Any, Optional
 
 import httpx
 
+from depenemy import __version__
 from depenemy.cache import Cache
 from depenemy.fetchers.base import BaseFetcher
 from depenemy.types import Dependency, Ecosystem, PackageMetadata
@@ -17,7 +18,7 @@ class CratesFetcher(BaseFetcher):
     ecosystem = Ecosystem.CARGO
 
     API = "https://crates.io/api/v1"
-    HEADERS = {"User-Agent": "depenemy/0.1.0 (https://github.com/W3OSC/depenemy)"}
+    HEADERS = {"User-Agent": f"depenemy/{__version__} (https://github.com/W3OSC/depenemy)"}
 
     def __init__(self, client: httpx.AsyncClient, cache: Cache) -> None:
         self._client = client
