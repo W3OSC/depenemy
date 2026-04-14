@@ -1,18 +1,10 @@
 <div align="center">
 
-<pre>
- ____  _____ ____  _____ _   _ _____ __  __ __   __
-|  _ \| ____|  _ \| ____| \ | | ____|  \/  |\ \ / /
-| | | |  _| | |_) |  _| |  \| |  _| | |\/| | \ V /
-| |_| | |___|  __/| |___| |\  | |___| |  | |  | |
-|____/|_____|_|   |_____|_| \_|_____|_|  |_|  |_|
-</pre>
-
-<img src="assets/banner.svg" alt="depenemy — one of your dependencies might be your enemy" width="680"/>
+<img src="assets/logos/logo.svg" alt="depenemy" width="380"/>
 
 **Your dependencies could be your enemy.**
 
-Depenemy scans your project for supply chain risks, behavioral issues, and reputation red flags — before they can do damage.
+Depenemy scans your project for supply chain risks, behavioral issues, and reputation red flags - before they can do damage.
 
 [![CI](https://github.com/W3OSC/depenemy/actions/workflows/ci.yml/badge.svg)](https://github.com/W3OSC/depenemy/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/depenemy)](https://pypi.org/project/depenemy/)
@@ -25,9 +17,9 @@ Depenemy scans your project for supply chain risks, behavioral issues, and reput
 
 ## Why depenemy?
 
-Modern projects pull in hundreds of dependencies. Each one is a potential entry point for a supply chain attack — a compromised maintainer account, a typosquatted package, an old version with a known CVE, or a package that runs arbitrary code on install.
+Modern projects pull in hundreds of dependencies. Each one is a potential entry point for a supply chain attack - a compromised maintainer account, a typosquatted package, an old version with a known CVE, or a package that runs arbitrary code on install.
 
-Depenemy gives you **a single command** that audits all your dependencies across npm, Python, Rust, and Solidity — and tells you exactly what looks suspicious and why.
+Depenemy gives you **a single command** that audits all your dependencies across npm, Python, Rust, and Solidity - and tells you exactly what looks suspicious and why.
 
 ---
 
@@ -37,7 +29,7 @@ Depenemy gives you **a single command** that audits all your dependencies across
 
 | ID | Name | Description | Severity |
 |----|------|-------------|----------|
-| B001 | Range specifier | Version uses `^`, `~`, `>=`, `*` — allows unexpected updates | Warning |
+| B001 | Range specifier | Version uses `^`, `~`, `>=`, `*` - allows unexpected updates | Warning |
 | B002 | No version pinned | No version specified at all | Error |
 | B003 | Lagging version | Pinned version is significantly behind latest | Error |
 
@@ -113,18 +105,30 @@ depenemy rules
 **Example output:**
 
 ```
-depenemy v0.1.0 - scanning 1 path(s)...
+────────────────────────── depenemy ──────────────────────────
 
-✗  S005  Known malicious package
-   event-stream@3.3.6    malicious activity recorded  →  no malicious history
+ ERROR  S005  Known malicious package  ·  1 package
+     This package has a recorded history of malicious activity in OSV.
 
-✗  R007  Known vulnerable version
-   lodash@4.17.4         4.17.4 [high CVE]            →  4.17.21
+     event-stream  npm  malicious activity recorded
 
-⚠  B001  Range specifier
-   axios@^1.4.0          range specifier              →  pinned version
+ ERROR  R007  Known vulnerable version  ·  1 package
+     The target version is older than a version released to fix a known vulnerability.
 
-Summary: 42 packages scanned — 2 error(s), 1 warning(s)
+     lodash        npm  4.17.4 [high CVE]  ->  4.17.21
+
+ WARNING  B001  Range specifier  ·  3 packages
+     Dependency uses a version range instead of an exact pin.
+
+     axios         npm  ^1.4.0
+     express       npm  ^4.18.0
+     react         npm  ^18.0.0
+
+──────────────────────────────────────────────────────────────
+
+  42 packages scanned   2 errors   1 warning
+
+Full results -> depenemy-results.json
 ```
 
 ---
@@ -242,4 +246,4 @@ In GitHub Actions, `${{ secrets.GITHUB_TOKEN }}` is available automatically.
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+MIT - see [LICENSE](LICENSE)
