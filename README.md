@@ -92,8 +92,11 @@ depenemy scan pyproject.toml
 # Output as SARIF (for GitHub Code Scanning)
 depenemy scan . --output sarif --output-file results.sarif
 
-# Output as JSON
-depenemy scan . --output json --output-file results.json
+# Output as JSON to a custom filename (table scan always writes depenemy-results.json automatically)
+depenemy scan . --output json --output-file my-results.json
+
+# Pipe JSON output to another tool
+depenemy scan . --output json | jq '.findings'
 
 # Fail the command if any warnings exist (useful in CI)
 depenemy scan . --fail-on warning
