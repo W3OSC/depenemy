@@ -33,5 +33,4 @@ class S001InstallScripts(BaseRule):
             f"If this package is compromised, the malicious code executes on every developer machine "
             f"and CI server without any prompt or approval. Audit the install script before use.",
             actual="runs code on install",
-            expected="review or remove",
         )

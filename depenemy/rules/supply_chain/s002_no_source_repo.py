@@ -32,5 +32,4 @@ class S002NoSourceRepo(BaseRule):
             f"`{dep.name}` has no source repository linked in its metadata. "
             f"The code cannot be independently audited.",
             actual="no repository URL",
-            expected="valid repository URL",
         )

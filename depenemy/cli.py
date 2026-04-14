@@ -78,13 +78,21 @@ def cmd_scan(
 
     result = anyio.run(scan, paths, config)
 
+    # Always write full results to JSON (table view only shows first 5 per rule)
+    if output == OutputFormat.table and not output_file:
+        from depenemy.reporters.json_reporter import write_json
+        json_path = Path("depenemy-results.json")
+        write_json(result, json_path)
+
     if output == OutputFormat.table:
         from depenemy.reporters.table import print_table
+
         if output_file:
             out_console = Console(file=output_file.open("w"), highlight=False)
             print_table(result, console=out_console)
         else:
             print_table(result, console=console)
+            console.print(f"[bright_black]Full results → [bold]depenemy-results.json[/bold][/bright_black]\n")
 
     elif output == OutputFormat.sarif:
         from depenemy.reporters.sarif import generate_sarif, write_sarif

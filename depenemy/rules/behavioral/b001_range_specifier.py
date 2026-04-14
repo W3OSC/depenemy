@@ -39,7 +39,6 @@ class B001RangeSpecifier(BaseRule):
                 f"`{dep.name}` uses `{spec}` - any version can be installed automatically "
                 f"without your approval. This is how supply chain attacks like axios happen.",
                 actual=spec,
-                expected="exact version, e.g. 1.2.3",
             )
         if RANGE_PATTERN.search(spec):
             return self._finding(
@@ -48,6 +47,5 @@ class B001RangeSpecifier(BaseRule):
                 f"`{dep.name}` uses range `{spec}` - a malicious update can be pulled in "
                 f"automatically without your approval. Pin to an exact version.",
                 actual=spec,
-                expected="exact version, e.g. 1.2.3",
             )
         return None

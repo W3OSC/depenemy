@@ -33,5 +33,4 @@ class S005MaliciousPackage(BaseRule):
             f"`{dep.name}` has a known malicious activity record ({advisory.id}): "
             f"{advisory.description}",
             actual="malicious activity recorded",
-            expected="no malicious history",
         )

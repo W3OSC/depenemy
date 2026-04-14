@@ -32,5 +32,4 @@ class S003ArchivedRepo(BaseRule):
             f"`{dep.name}` source repository is archived - "
             f"no further updates or security fixes will be made.",
             actual="archived",
-            expected="active repository",
         )

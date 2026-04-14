@@ -43,8 +43,9 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# depenemy cache
+# depenemy output
 .depenemy_cache/
+depenemy-results.json
 
 # Team coordination
 TODO.md
