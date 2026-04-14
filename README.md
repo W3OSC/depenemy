@@ -106,7 +106,7 @@ depenemy rules
 ```
 
 **Example output:**
-<img width="995" height="754" alt="image" src="https://github.com/user-attachments/assets/ce989d4f-54f1-4a3c-9a94-46fab88974a5" />
+<img width="1070" height="711" alt="image" src="https://github.com/user-attachments/assets/96d22774-9649-4b2e-ba09-c3311df8ae3c" />
 
 
 ---
