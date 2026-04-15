@@ -113,7 +113,7 @@ depenemy rules
 
 ### GitHub Action
 
-Create `.github/workflows/depenemy.yml` in your repository:
+To get findings in your **Security > Code Scanning** tab, create `.github/workflows/depenemy.yml` in your repository:
 
 ```yaml
 name: Depenemy scan
