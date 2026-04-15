@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-04-15
+
+### Fixed
+- Added `.pre-commit-hooks.yaml` so the pre-commit hook actually works
+- Updated README with full GitHub Action workflow example
+
 ## [0.1.0] - 2026-04-09
 
 ### Added
