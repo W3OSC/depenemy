@@ -117,7 +117,7 @@ Add to your workflow and results appear automatically as [Code Scanning alerts](
 
 ```yaml
 - name: Scan dependencies
-  uses: W3OSC/depenemy@v0.1.0
+  uses: W3OSC/depenemy@v0.1.1
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     fail-on: error
@@ -132,7 +132,7 @@ Block pushes that introduce risky dependencies. Add to `.pre-commit-config.yaml`
 ```yaml
 repos:
   - repo: https://github.com/W3OSC/depenemy
-    rev: v0.1.0
+    rev: v0.1.1
     hooks:
       - id: depenemy
 ```

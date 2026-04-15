@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "depenemy"
-version = "0.1.0"
+version = "0.1.1"
 description = "Dependency scanner that finds your enemies in the supply chain"
 readme = "README.md"
 license = { file = "LICENSE" }
