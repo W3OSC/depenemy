@@ -208,3 +208,7 @@ In GitHub Actions, `${{ secrets.GITHUB_TOKEN }}` is available automatically.
 ## License
 
 MIT - see [LICENSE](LICENSE)
+
+
+<img width="610" height="608" alt="image" src="https://github.com/user-attachments/assets/e16209b5-531c-4259-b2a7-d8be479ec570" />
+
