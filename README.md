@@ -113,15 +113,27 @@ depenemy rules
 
 ### GitHub Action
 
-Add to your workflow and results appear automatically as [Code Scanning alerts](https://docs.github.com/en/code-security/code-scanning) on every pull request:
+Create `.github/workflows/depenemy.yml` in your repository:
 
 ```yaml
-- name: Scan dependencies
-  uses: W3OSC/depenemy@v0.1.1
-  with:
-    token: ${{ secrets.GITHUB_TOKEN }}
-    fail-on: error
+name: Depenemy scan
+on: [push, pull_request]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: W3OSC/depenemy@v0.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # optional - unlocks R001 and R006 checks
+          fail-on: error
 ```
+
+Results appear automatically as [Code Scanning alerts](https://docs.github.com/en/code-security/code-scanning) in your Security tab on every push and pull request.
 
 ---
 
