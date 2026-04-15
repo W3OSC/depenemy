@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/logos/logo.svg" alt="depenemy" width="380"/>
+<img src="https://raw.githubusercontent.com/W3OSC/depenemy/main/assets/logos/logo.svg" alt="depenemy" width="380"/>
 
 **Your dependencies could be your enemy.**
 
