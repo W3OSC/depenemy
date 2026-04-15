@@ -1,0 +1,8 @@
+- id: depenemy
+  name: depenemy dependency scan
+  language: python
+  entry: depenemy scan
+  args: [--fail-on, error]
+  pass_filenames: false
+  always_run: true
+  description: Scan dependencies for supply chain risks, behavioral issues, and reputation red flags.
