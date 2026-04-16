@@ -134,6 +134,7 @@ jobs:
 ```
 
 Results appear automatically as [Code Scanning alerts](https://docs.github.com/en/code-security/code-scanning) in your Security tab on every push and pull request.
+<img width="1678" height="662" alt="image" src="https://github.com/user-attachments/assets/f19738dc-d029-483c-ae0f-e73a46bff7e3" />
 
 ---
 
