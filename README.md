@@ -226,6 +226,19 @@ In GitHub Actions, `${{ secrets.GITHUB_TOKEN }}` is available automatically.
 
 ---
 
+## Development
+
+```bash
+git clone https://github.com/W3OSC/depenemy.git
+cd depenemy
+pip install -e ".[dev]"
+
+# Run tests
+pytest --no-cov -q
+```
+
+---
+
 ## License
 
 MIT - see [LICENSE](LICENSE)
