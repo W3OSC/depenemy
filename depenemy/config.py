@@ -32,6 +32,7 @@ class Thresholds:
     min_contributors: int = 5
     max_version_lag: int = 10
     typosquatting_distance: int = 1
+    min_version_age_days: int = 7
 
 
 DEFAULT_RULES: dict[str, Severity] = {
@@ -49,6 +50,7 @@ DEFAULT_RULES: dict[str, Severity] = {
     "R007": Severity.ERROR,    # known CVE - active security threat
     "R008": Severity.WARNING,  # deprecated - should migrate, not urgent
     "R009": Severity.WARNING,  # typosquatting suspected - signal
+    "R010": Severity.ERROR,    # recently published version - active attack window
     # Supply chain
     "S001": Severity.ERROR,    # install scripts - executes code on install
     "S002": Severity.WARNING,  # no source repo - hygiene

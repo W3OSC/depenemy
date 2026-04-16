@@ -7,6 +7,7 @@ from depenemy.rules.reputation.r006_few_contributors import R006FewContributors
 from depenemy.rules.reputation.r007_below_security_patch import R007BelowSecurityPatch
 from depenemy.rules.reputation.r008_deprecated import R008Deprecated
 from depenemy.rules.reputation.r009_typosquatting import R009Typosquatting
+from depenemy.rules.reputation.r010_recently_published_version import R010RecentlyPublishedVersion
 
 __all__ = [
     "R001YoungAuthor",
@@ -18,4 +19,5 @@ __all__ = [
     "R007BelowSecurityPatch",
     "R008Deprecated",
     "R009Typosquatting",
+    "R010RecentlyPublishedVersion",
 ]

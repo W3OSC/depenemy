@@ -46,6 +46,7 @@ Depenemy gives you **a single command** that audits all your dependencies across
 | R007 | Known vulnerable version | Your version is below a known security patch (OSV/CVE) | Error |
 | R008 | Deprecated package | Package is officially marked as deprecated | Warning |
 | R009 | Typosquatting suspected | Name is suspiciously close to a popular package | Warning |
+| R010 | Recently published version | Version was published < 7 days ago - not yet vetted by the community | Error |
 
 ### Supply chain risks
 

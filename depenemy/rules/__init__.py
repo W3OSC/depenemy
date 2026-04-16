@@ -12,6 +12,7 @@ from depenemy.rules.reputation import (
     R007BelowSecurityPatch,
     R008Deprecated,
     R009Typosquatting,
+    R010RecentlyPublishedVersion,
 )
 from depenemy.rules.supply_chain import (
     S001InstallScripts,
@@ -34,6 +35,7 @@ ALL_RULES: list[BaseRule] = [
     R007BelowSecurityPatch(),
     R008Deprecated(),
     R009Typosquatting(),
+    R010RecentlyPublishedVersion(),
     S001InstallScripts(),
     S002NoSourceRepo(),
     S003ArchivedRepo(),
