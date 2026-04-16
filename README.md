@@ -145,7 +145,7 @@ Block commits that introduce error-level dependency findings. Add to `.pre-commi
 ```yaml
 repos:
   - repo: https://github.com/W3OSC/depenemy
-    rev: v0.1.1
+    rev: v0.1.2
     hooks:
       - id: depenemy
 ```
