@@ -127,7 +127,7 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v4
-      - uses: W3OSC/depenemy@v0.1.1
+      - uses: W3OSC/depenemy-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}  # optional - unlocks R001 and R006 checks
           fail-on: error
