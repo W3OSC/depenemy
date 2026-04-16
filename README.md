@@ -113,7 +113,7 @@ depenemy rules
 
 ### GitHub Action
 
-To get findings in your **Security > Code Scanning** tab, create `.github/workflows/depenemy.yml` in your repository:
+CI pipelines are supported via the [depenemy-action](https://github.com/W3OSC/depenemy-action) GitHub Action — it continuously scans your dependencies on every push and pull request, and surfaces findings directly in your repository's Security tab. Create `.github/workflows/depenemy.yml` in your repository:
 
 ```yaml
 name: Depenemy scan
