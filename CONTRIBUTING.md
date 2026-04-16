@@ -1,6 +1,6 @@
 # Contributing to depenemy
 
-Thank you for your interest in contributing. This guide covers how to set up the project locally, run tests, and add new rules.
+Thank you for your interest in contributing. This guide covers how to set up the project locally, run tests, add new rules, and add support for new ecosystems.
 
 ---
 
@@ -202,6 +202,21 @@ Add the new rule to the table in `README.md` under the correct category with ID,
 - [ ] New rule added to `ALL_RULES` and `DEFAULT_RULES`
 - [ ] README table updated
 - [ ] Test covers: fires, silent, rule disabled
+
+---
+
+## Adding a new ecosystem
+
+To add support for a new package ecosystem (e.g. Go, Ruby, Java):
+
+1. **Add the ecosystem value** to `Ecosystem` enum in `depenemy/types.py`
+2. **Create a parser** in `depenemy/parsers/` — reads the manifest file and returns a list of `Dependency` objects
+3. **Create a fetcher** in `depenemy/fetchers/` — calls the registry API and returns `PackageMetadata`
+4. **Register the parser** in `depenemy/scanner.py` inside `_get_parsers()`
+5. **Add fixture files** in `tests/fixtures/` with sample manifest files for testing
+6. **Write parser tests** in `tests/test_parsers/`
+
+Look at `depenemy/parsers/python.py` and `depenemy/fetchers/pypi.py` as a reference — they are the simplest and cleanest examples.
 
 ---
 
