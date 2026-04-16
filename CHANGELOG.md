@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-04-16
+
+### Changed
+- Version is now read dynamically from package metadata - only one place to update on release
+- Moved GitHub Action to separate repo `W3OSC/depenemy-action`
+
+### Fixed
+- README clarifications: pre-commit setup, GitHub Action workflow, Code Scanning public repo requirement
+
 ## [0.1.1] - 2026-04-15
 
 ### Fixed
