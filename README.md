@@ -140,7 +140,7 @@ Results appear automatically as [Code Scanning alerts](https://docs.github.com/e
 
 ### Pre-commit hook
 
-Block pushes that introduce risky dependencies. Add to `.pre-commit-config.yaml`:
+Block commits that introduce error-level dependency findings. Add to `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
@@ -149,6 +149,14 @@ repos:
     hooks:
       - id: depenemy
 ```
+
+Then run once to activate:
+
+```bash
+pre-commit install
+```
+
+From that point on, depenemy runs automatically before every `git commit`.
 
 ---
 
