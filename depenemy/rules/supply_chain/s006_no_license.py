@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Any
 
 from depenemy.config import Config
 from depenemy.rules.base import BaseRule
@@ -17,13 +17,36 @@ class S006NoLicense(BaseRule):
         "Using such packages may introduce legal and compliance risks."
     )
 
+    # Common placeholder values treated as "no license"
     INVALID_LICENSE_VALUES = {
-        None,
         "",
         "unknown",
         "unlicensed",
         "none",
+        "n/a",
+        "na",
     }
+
+    def _normalize_license(self, value: Any) -> str:
+        """
+        Normalize license value into a comparable string.
+        Handles strings, lists, dicts, and unexpected formats safely.
+        """
+        if value is None:
+            return ""
+
+        # Handle list format (some ecosystems return multiple licenses)
+        if isinstance(value, list):
+            value = " ".join(str(v) for v in value)
+
+        # Handle dict format (e.g., {"type": "MIT"})
+        if isinstance(value, dict):
+            value = value.get("type") or value.get("name") or ""
+
+        if not isinstance(value, str):
+            return ""
+
+        return value.strip().lower()
 
     def _check(
         self,
@@ -32,16 +55,15 @@ class S006NoLicense(BaseRule):
         config: Config,
     ) -> Optional[Finding]:
 
-        license_value = getattr(meta, "license", None)
+        raw_license = getattr(meta, "license", None)
+        normalized = self._normalize_license(raw_license)
 
-        # Normalize license
-        if isinstance(license_value, str):
-            normalized = license_value.strip().lower()
-        else:
-            normalized = None
+        # Handle "SEE LICENSE IN ..." pattern (common in npm)
+        if normalized.startswith("see license in"):
+            normalized = ""
 
-        # Check invalid or missing license
-        if normalized not in self.INVALID_LICENSE_VALUES:
+        # If valid license exists → no issue
+        if normalized and normalized not in self.INVALID_LICENSE_VALUES:
             return None
 
         return self._finding(
