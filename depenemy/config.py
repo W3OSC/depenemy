@@ -40,6 +40,7 @@ DEFAULT_RULES: dict[str, Severity] = {
     "B001": Severity.WARNING,  # range specifier - hygiene
     "B002": Severity.ERROR,    # completely unpinned - active risk
     "B003": Severity.WARNING,  # lagging version - hygiene, CVEs caught by R007
+    "B004": Severity.ERROR,    # missing lockfile - active risk, fresh installs re-resolve
     # Reputation
     "R001": Severity.WARNING,  # young author - signal, not proof
     "R002": Severity.WARNING,  # new package - signal, not proof

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Optional
 
 from depenemy.config import Config
@@ -44,6 +45,29 @@ class BaseRule(ABC):
         config: Config,
     ) -> Optional[Finding]:
         """Perform the actual check. Return Finding or None."""
+
+    def check_project(
+        self,
+        manifest_path: Path,
+        deps: list[Dependency],
+        config: Config,
+    ) -> list[Finding]:
+        """Project-level check, run once per scanned manifest.
+
+        Default no-op; override for rules that look at a manifest as a whole
+        (e.g., presence of a sibling lockfile) rather than at individual deps.
+        """
+        if not config.is_rule_enabled(self.id):
+            return []
+        return self._check_project(manifest_path, deps, config)
+
+    def _check_project(
+        self,
+        manifest_path: Path,
+        deps: list[Dependency],
+        config: Config,
+    ) -> list[Finding]:
+        return []
 
     def _finding(
         self,

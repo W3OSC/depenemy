@@ -137,6 +137,21 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
                     seen_findings.add(finding_key)
                     findings.append(finding)
 
+    # 5. Run project-level rules once per scanned manifest.
+    deps_by_manifest: dict[str, list[Dependency]] = {}
+    for dep in deps:
+        deps_by_manifest.setdefault(dep.location.file, []).append(dep)
+    seen_project: set[tuple[str, str]] = set()
+    for manifest_file, manifest_deps in deps_by_manifest.items():
+        manifest_path = Path(manifest_file)
+        for rule in ALL_RULES:
+            for finding in rule.check_project(manifest_path, manifest_deps, config):
+                key = (manifest_file, rule.id)
+                if key in seen_project:
+                    continue
+                seen_project.add(key)
+                findings.append(finding)
+
     return ScanResult(
         dependencies=unique_deps,
         findings=findings,

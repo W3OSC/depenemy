@@ -1,7 +1,12 @@
 """All depenemy rules."""
 
 from depenemy.rules.base import BaseRule
-from depenemy.rules.behavioral import B001RangeSpecifier, B002Unpinned, B003LaggingVersion
+from depenemy.rules.behavioral import (
+    B001RangeSpecifier,
+    B002Unpinned,
+    B003LaggingVersion,
+    B004EnforceLockfile,
+)
 from depenemy.rules.reputation import (
     R001YoungAuthor,
     R002YoungPackage,
@@ -26,6 +31,7 @@ ALL_RULES: list[BaseRule] = [
     B001RangeSpecifier(),
     B002Unpinned(),
     B003LaggingVersion(),
+    B004EnforceLockfile(),
     R001YoungAuthor(),
     R002YoungPackage(),
     R003LowWeeklyDownloads(),

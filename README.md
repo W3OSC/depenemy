@@ -32,6 +32,7 @@ Depenemy gives you **a single command** that audits all your dependencies across
 | B001 | Range specifier | Version uses `^`, `~`, `>=`, `*` - allows unexpected updates | Warning |
 | B002 | No version pinned | No version specified at all | Error |
 | B003 | Lagging version | Pinned version is significantly behind latest | Warning |
+| B004 | Lockfile missing | Manifest has no adjacent lockfile - fresh installs re-resolve every time | Error |
 
 ### Reputation signals
 
@@ -52,7 +53,7 @@ Depenemy gives you **a single command** that audits all your dependencies across
 
 | ID | Name | Description | Severity |
 |----|------|-------------|----------|
-| S001 | Install scripts | Package runs code at install time (`postinstall`, `preinstall`) | Error |
+| S001 | Install scripts | Package runs code at install time (`postinstall`, `preinstall`) — **npm only** | Error |
 | S002 | No source repository | No GitHub/GitLab link in package metadata | Warning |
 | S003 | Archived repository | Source repo has been archived or deleted | Warning |
 | S004 | Dependency confusion | Private package name found on public registry | Warning |

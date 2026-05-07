@@ -15,6 +15,7 @@ rules:
   B001: warning  # range specifier (^, ~, >=, *) - hygiene
   B002: error    # no version pinned - active risk
   B003: warning  # lagging version - hygiene, CVEs caught by R007
+  B004: error    # missing lockfile - fresh installs re-resolve every time
   R001: warning  # young author account - signal, not proof
   R002: warning  # young package - signal, not proof
   R003: warning  # low weekly downloads - signal

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- B004: Enforce lockfile - flags manifests with no adjacent lockfile (Error). Supports `package.json`/`Pipfile`/`pyproject.toml`/`Cargo.toml`; `requirements*.txt` skipped (it is itself a pin source).
+- `BaseRule.check_project()` hook for project-level rules that operate on a manifest as a whole.
+
 ## [0.1.4] - 2026-04-16
 
 ### Fixed
