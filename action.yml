@@ -10,7 +10,7 @@ inputs:
   token:
     description: GitHub token for author and contributor lookups
     required: false
-    default: ${{ github.token }}
+    default: ""
   paths:
     description: Space-separated paths to scan (default: repository root)
     required: false
@@ -89,7 +89,7 @@ runs:
     - name: Run depenemy scan
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.token }}
+        GITHUB_TOKEN: ${{ inputs.token || github.token }}
       run: |
         ARGS="${{ inputs.paths }}"
         ARGS="$ARGS --output sarif --output-file ${{ inputs.output-sarif }}"

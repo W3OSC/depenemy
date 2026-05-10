@@ -49,7 +49,7 @@ inputs:
   token:
     description: GitHub token used for author/publisher reputation lookups.
     required: false
-    default: ${{ github.token }}
+    default: ""
 
 outputs:
   findings-count:
