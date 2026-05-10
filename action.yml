@@ -46,10 +46,13 @@ inputs:
 outputs:
   sarif-file:
     description: Path to the generated SARIF file
+    value: ${{ steps.emit-outputs.outputs.sarif-file }}
   findings-count:
     description: Total number of findings
+    value: ${{ steps.scan.outputs.findings-count }}
   errors-count:
     description: Number of error-level findings
+    value: ${{ steps.scan.outputs.errors-count }}
 
 runs:
   using: composite
@@ -87,6 +90,7 @@ runs:
         print(f"Generated {cfg_path} with registries: {registries}")
 
     - name: Run depenemy scan
+      id: scan
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.token || github.token }}
@@ -106,6 +110,13 @@ runs:
         fi
 
         depenemy scan $ARGS
+
+    - name: Emit sarif-file output
+      id: emit-outputs
+      if: always()
+      shell: bash
+      run: |
+        echo "sarif-file=${{ inputs.output-sarif }}" >> "$GITHUB_OUTPUT"
 
     - name: Upload SARIF to GitHub Code Scanning
       if: inputs.upload-sarif == 'true' && always()
