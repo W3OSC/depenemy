@@ -12,7 +12,7 @@ inputs:
     required: false
     default: ""
   paths:
-    description: Space-separated paths to scan (default: repository root)
+    description: "Space-separated paths to scan (default: repository root)"
     required: false
     default: "."
   fail-on:
