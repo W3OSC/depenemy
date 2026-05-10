@@ -19,8 +19,8 @@ class NpmParser(BaseParser):
 
         deps: list[Dependency] = []
 
-        # Read resolved versions from adjacent lockfile if available
-        resolved = _read_lockfile(path.parent)
+        # Read resolved versions, integrity, and resolved URLs from adjacent lockfile
+        lockfile_data = _read_lockfile(path.parent)
 
         dep_sections = {
             "dependencies": False,
@@ -39,22 +39,25 @@ class NpmParser(BaseParser):
                 if not isinstance(version_spec, str):
                     continue
                 line, col = line_map.get(name, (1, 1))
+                lock_entry = lockfile_data.get(name, {})
                 deps.append(
                     Dependency(
                         name=name,
                         version_spec=version_spec,
                         ecosystem=Ecosystem.NPM,
                         location=Location(file=str(path), line=line, column=col),
-                        resolved_version=resolved.get(name),
+                        resolved_version=lock_entry.get("version"),
                         is_dev=is_dev,
+                        lockfile_integrity=lock_entry.get("integrity") or None,
+                        lockfile_resolved=lock_entry.get("resolved") or None,
                     )
                 )
 
         return deps
 
 
-def _read_lockfile(directory: Path) -> dict[str, str]:
-    """Extract name→version map from package-lock.json or yarn.lock."""
+def _read_lockfile(directory: Path) -> dict[str, dict[str, str]]:
+    """Extract name→{version, integrity, resolved} map from package-lock.json."""
     lockfile = directory / "package-lock.json"
     if lockfile.exists():
         try:
@@ -62,13 +65,17 @@ def _read_lockfile(directory: Path) -> dict[str, str]:
                 data = json.load(f)
             # v2/v3 lockfile format
             packages = data.get("packages", {})
-            result: dict[str, str] = {}
+            result: dict[str, dict[str, str]] = {}
             for pkg_path, info in packages.items():
                 if not pkg_path:  # root package
                     continue
                 name = pkg_path.removeprefix("node_modules/")
                 if isinstance(info, dict) and "version" in info:
-                    result[name] = info["version"]
+                    result[name] = {
+                        "version": info["version"],
+                        "integrity": info.get("integrity", ""),
+                        "resolved": info.get("resolved", ""),
+                    }
             return result
         except (json.JSONDecodeError, OSError):
             pass

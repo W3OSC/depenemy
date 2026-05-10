@@ -1,0 +1,70 @@
+# Starter workflow for depenemy supply chain scanning.
+# Copy this file to .github/workflows/supply-chain.yml in your repository.
+# Adjust approved-registries if you use a private npm registry.
+
+name: Supply Chain Security
+
+on:
+  pull_request:
+    paths:
+      - "package.json"
+      - "package-lock.json"
+      - "**/package.json"
+      - "**/package-lock.json"
+  push:
+    branches: [main, master]
+
+# Minimal permissions — only what is needed
+permissions:
+  contents: read
+  security-events: write  # required to upload SARIF to GitHub Code Scanning
+
+jobs:
+  depenemy:
+    name: Supply Chain Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history lets depenemy compare against base branch
+
+      - name: Run depenemy
+        id: scan
+        uses: W3OSC/depenemy@v1
+        with:
+          # List of registry hostnames your organisation has approved.
+          # Packages resolved from any other host are BLOCKED (rule B006).
+          approved-registries: "registry.npmjs.org"
+
+          # Fail the job when error-severity findings are detected.
+          # Use 'warning' to block on warnings too, or 'never' for report-only mode.
+          fail-on: error
+
+          # Optional: point at your own .depenemy.yml for full rule customisation.
+          # config: .depenemy.yml
+
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload SARIF so findings appear in the Security tab → Code Scanning Alerts
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always()  # upload even when the scan step fails
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif-file }}
+          category: depenemy
+
+      # Print a summary in the Actions job summary page
+      - name: Summarise findings
+        if: always()
+        run: |
+          echo "### 🔍 depenemy Supply Chain Scan" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Metric | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Total findings | ${{ steps.scan.outputs.findings-count }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Error findings | ${{ steps.scan.outputs.errors-count }} |" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.scan.outputs.errors-count }}" -gt "0" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> ⚠️ **This PR has blocking supply chain findings.** Check the Code Scanning tab for details." >> "$GITHUB_STEP_SUMMARY"
+          fi

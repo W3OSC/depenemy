@@ -48,6 +48,8 @@ class Dependency:
     location: Location
     resolved_version: Optional[str] = None   # From lockfile if available
     is_dev: bool = False
+    lockfile_integrity: Optional[str] = None  # _integrity from package-lock.json (B005)
+    lockfile_resolved: Optional[str] = None   # resolved URL from package-lock.json (B006/B007)
 
 
 @dataclass
@@ -82,6 +84,20 @@ class PackageMetadata:
     is_archived: bool = False
     advisories: list[Advisory] = field(default_factory=list)
     malicious_advisories: list[Advisory] = field(default_factory=list)
+    # Provenance (S006)
+    has_provenance: bool = False
+    registry_integrity: Optional[str] = None       # dist.integrity from registry (B005)
+    # Publisher identity (S009)
+    publisher_name: Optional[str] = None            # npm account that published target_version
+    publisher_has_github: bool = True               # False if publisher has no GitHub account
+    # Behavioral signals — GitHub repo (S007)
+    repo_commit_count: int = 0
+    repo_issue_count: int = 0
+    repo_pr_count: int = 0
+    repo_has_ci: bool = False
+    repo_created_at: Optional[datetime] = None
+    # Behavioral signals — author activity (S008)
+    author_package_burst_count: int = 0             # packages published in bulk_publish_window_hours window
 
 
 @dataclass

@@ -33,6 +33,13 @@ class Thresholds:
     max_version_lag: int = 10
     typosquatting_distance: int = 1
     min_version_age_days: int = 7
+    # Ghost repository (S007)
+    ghost_repo_max_commits: int = 2
+    # Bulk publish burst (S008)
+    bulk_publish_window_hours: int = 48
+    bulk_publish_min_packages: int = 3
+    # Composite score (C001)
+    composite_score_threshold: int = 4
 
 
 DEFAULT_RULES: dict[str, Severity] = {
@@ -41,6 +48,9 @@ DEFAULT_RULES: dict[str, Severity] = {
     "B002": Severity.ERROR,    # completely unpinned - active risk
     "B003": Severity.WARNING,  # lagging version - hygiene, CVEs caught by R007
     "B004": Severity.ERROR,    # missing lockfile - active risk, fresh installs re-resolve
+    "B005": Severity.ERROR,    # hash mismatch - confirmed tampering
+    "B006": Severity.ERROR,    # bad registry - confirmed redirect
+    "B007": Severity.ERROR,    # lockfile injection - non-registry protocol
     # Reputation
     "R001": Severity.WARNING,  # young author - signal, not proof
     "R002": Severity.WARNING,  # new package - signal, not proof
@@ -58,6 +68,12 @@ DEFAULT_RULES: dict[str, Severity] = {
     "S003": Severity.WARNING,  # archived repo - maintenance issue
     "S004": Severity.WARNING,  # dependency confusion - signal
     "S005": Severity.ERROR,    # known malicious - active security threat
+    "S006": Severity.WARNING,  # missing provenance - informational
+    "S007": Severity.WARNING,  # ghost repository - behavioral signal
+    "S008": Severity.WARNING,  # bulk publish burst - behavioral signal
+    "S009": Severity.WARNING,  # publisher/github identity mismatch - behavioral signal
+    # Composite
+    "C001": Severity.ERROR,    # composite behavioral score - 4+ signals = confirmed attacker pattern
 }
 
 
@@ -70,6 +86,7 @@ class Config:
     github_token: Optional[str] = None
     cache_dir: Path = field(default_factory=lambda: Path(".depenemy_cache"))
     no_cache: bool = False
+    approved_registries: list[str] = field(default_factory=lambda: ["registry.npmjs.org"])
 
     def is_rule_enabled(self, rule_id: str) -> bool:
         return rule_id in self.rules
@@ -112,8 +129,15 @@ def load_config(path: Optional[Path] = None) -> Config:
             min_contributors=t.get("min_contributors", defaults.min_contributors),
             max_version_lag=t.get("max_version_lag", defaults.max_version_lag),
             typosquatting_distance=t.get("typosquatting_distance", defaults.typosquatting_distance),
+            ghost_repo_max_commits=t.get("ghost_repo_max_commits", defaults.ghost_repo_max_commits),
+            bulk_publish_window_hours=t.get("bulk_publish_window_hours", defaults.bulk_publish_window_hours),
+            bulk_publish_min_packages=t.get("bulk_publish_min_packages", defaults.bulk_publish_min_packages),
+            composite_score_threshold=t.get("composite_score_threshold", defaults.composite_score_threshold),
         )
         config.thresholds = thresholds
+
+    if "approved_registries" in raw and isinstance(raw["approved_registries"], list):
+        config.approved_registries = [str(r) for r in raw["approved_registries"]]
 
     if "rules" in raw:
         rules: dict[str, Severity] = {}

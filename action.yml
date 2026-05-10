@@ -35,6 +35,13 @@ inputs:
     description: Automatically upload SARIF to GitHub Code Scanning
     required: false
     default: "true"
+  approved-registries:
+    description: >
+      Comma-separated list of approved npm registry hostnames.
+      Packages resolved from any other host trigger a BLOCK finding (B006).
+      Only applied when no custom config file is provided.
+    required: false
+    default: "registry.npmjs.org"
 
 outputs:
   sarif-file:
@@ -56,6 +63,29 @@ runs:
       shell: bash
       run: pip install depenemy
 
+    - name: Generate registry config
+      if: inputs.config == '' && inputs.approved-registries != ''
+      shell: python
+      env:
+        INPUT_APPROVED_REGISTRIES: ${{ inputs.approved-registries }}
+        WORKSPACE: ${{ github.workspace }}
+      run: |
+        import json, os
+        raw = os.environ.get("INPUT_APPROVED_REGISTRIES", "registry.npmjs.org").strip()
+        if raw.startswith("["):
+            try:
+                registries = json.loads(raw)
+            except Exception:
+                registries = [r.strip() for r in raw.split(",") if r.strip()]
+        else:
+            registries = [r.strip() for r in raw.split(",") if r.strip()]
+        cfg_path = os.path.join(os.environ["WORKSPACE"], ".depenemy-action.yml")
+        with open(cfg_path, "w") as f:
+            f.write("approved_registries:\n")
+            for reg in registries:
+                f.write(f"  - {reg}\n")
+        print(f"Generated {cfg_path} with registries: {registries}")
+
     - name: Run depenemy scan
       shell: bash
       env:
@@ -67,7 +97,10 @@ runs:
 
         if [ -n "${{ inputs.config }}" ]; then
           ARGS="$ARGS --config ${{ inputs.config }}"
+        elif [ -f "${{ github.workspace }}/.depenemy-action.yml" ]; then
+          ARGS="$ARGS --config ${{ github.workspace }}/.depenemy-action.yml"
         fi
+
         if [ -n "${{ inputs.ecosystems }}" ]; then
           ARGS="$ARGS --ecosystem ${{ inputs.ecosystems }}"
         fi

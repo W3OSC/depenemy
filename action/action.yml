@@ -1,0 +1,70 @@
+# Docker-based variant of the depenemy action.
+#
+# Use this if you prefer a fully-isolated, reproducible environment:
+#
+#   - uses: W3OSC/depenemy/action@v1
+#
+# The composite action at the repo root (W3OSC/depenemy@v1) is the default
+# and works on all runner types including macOS and Windows.
+# This Docker variant requires a Linux runner.
+
+name: Depenemy Supply Chain Scanner (Docker)
+description: >
+  Docker-based depenemy action. Runs the depenemy engine in a fully isolated
+  container. Includes npm-specific supply chain checks (B006, B007, S007–S009,
+  C001) and generates SARIF output for GitHub Code Scanning.
+author: W3OSC
+
+branding:
+  icon: shield
+  color: red
+
+inputs:
+  approved-registries:
+    description: >
+      Comma-separated list of approved npm registry hostnames.
+      Packages resolved from any other host trigger a BLOCK finding (B006).
+    required: false
+    default: "registry.npmjs.org"
+
+  fail-on:
+    description: >
+      Minimum finding severity that causes the action to exit non-zero.
+      One of: error | warning | info | never
+    required: false
+    default: "error"
+
+  paths:
+    description: Space-separated paths to scan. Defaults to the repository root.
+    required: false
+    default: "."
+
+  config:
+    description: >
+      Path to a .depenemy.yml configuration file. When provided, overrides
+      the auto-generated config (approved-registries input is ignored).
+    required: false
+    default: ""
+
+  token:
+    description: GitHub token used for author/publisher reputation lookups.
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  findings-count:
+    description: "Total number of findings across all severity levels."
+  errors-count:
+    description: "Number of error-severity findings (the ones that block)."
+  sarif-file:
+    description: "Absolute path to the generated SARIF file."
+
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    INPUT_APPROVED_REGISTRIES: ${{ inputs.approved-registries }}
+    INPUT_FAIL_ON: ${{ inputs.fail-on }}
+    INPUT_PATHS: ${{ inputs.paths }}
+    INPUT_CONFIG: ${{ inputs.config }}
+    INPUT_GITHUB_TOKEN: ${{ inputs.token }}

@@ -22,7 +22,7 @@ from depenemy.parsers.npm import NpmParser
 from depenemy.parsers.python import PythonParser
 from depenemy.parsers.rust import RustParser
 from depenemy.rules import ALL_RULES
-from depenemy.types import Dependency, Ecosystem, Finding, PackageMetadata, ScanResult
+from depenemy.types import Dependency, Ecosystem, Finding, PackageMetadata, ScanResult, Severity
 
 _CONCURRENCY = 10  # max parallel registry requests
 
@@ -96,6 +96,7 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
                     meta.repository_url,
                     meta.author_name,
                     ecosystem_key=dep.ecosystem.value,
+                    publisher_name=meta.publisher_name,
                 )
                 meta.contributor_count = gh_data.get("contributor_count", 0)
                 meta.is_archived = gh_data.get("is_archived", False)
@@ -103,6 +104,15 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
                     meta.author_account_created_at = parse_date(
                         gh_data["author_account_created_at"]
                     )
+                # S007 ghost repo signals
+                meta.repo_commit_count = gh_data.get("repo_commit_count", 0)
+                meta.repo_issue_count = gh_data.get("repo_issue_count", 0)
+                meta.repo_pr_count = gh_data.get("repo_pr_count", 0)
+                meta.repo_has_ci = gh_data.get("repo_has_ci", False)
+                if gh_data.get("repo_created_at"):
+                    meta.repo_created_at = parse_date(gh_data["repo_created_at"])
+                # S009 publisher identity
+                meta.publisher_has_github = gh_data.get("publisher_has_github", True)
 
                 # Fetch security advisories
                 target = meta.target_version
@@ -151,6 +161,50 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
                     continue
                 seen_project.add(key)
                 findings.append(finding)
+
+    # 6. C001 — Composite supply-chain risk score.
+    #    After all per-dep findings are collected, aggregate contributing signal counts
+    #    per package. If a package accumulates enough signals, emit a C001 BLOCK finding.
+    _C001_CONTRIBUTING_RULES = {"S007", "S008", "S009", "R003", "R004", "R006"}
+    package_signals: dict[tuple[str, str], set[str]] = {}
+    for finding in findings:
+        dep_key = (finding.dependency.name, finding.dependency.ecosystem.value)
+        if finding.rule_id in _C001_CONTRIBUTING_RULES:
+            package_signals.setdefault(dep_key, set()).add(finding.rule_id)
+
+    threshold = config.thresholds.composite_score_threshold
+    c001_seen: set[tuple[str, str]] = set()
+    for (pkg_name, eco_val), fired_rules in package_signals.items():
+        if len(fired_rules) < threshold:
+            continue
+        if (pkg_name, eco_val) in c001_seen:
+            continue
+        c001_seen.add((pkg_name, eco_val))
+
+        # Find the first Dependency object for this package to anchor the finding
+        anchor_dep = next(
+            (d for d in deps if d.name == pkg_name and d.ecosystem.value == eco_val),
+            None,
+        )
+        if anchor_dep is None:
+            continue
+
+        signal_list = ", ".join(sorted(fired_rules))
+        findings.append(
+            Finding(
+                rule_id="C001",
+                rule_name="Composite supply-chain risk",
+                severity=Severity.ERROR,
+                dependency=anchor_dep,
+                message=(
+                    f"`{pkg_name}` triggered {len(fired_rules)} independent supply-chain "
+                    f"risk signals ({signal_list}), reaching the composite risk threshold "
+                    f"of {threshold}. The combination of these signals strongly indicates "
+                    f"this package is malicious or has been compromised."
+                ),
+                actual=f"score={len(fired_rules)}/{threshold}",
+            )
+        )
 
     return ScanResult(
         dependencies=unique_deps,

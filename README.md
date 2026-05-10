@@ -115,28 +115,82 @@ depenemy rules
 
 ### GitHub Action
 
-CI pipelines are supported via the [depenemy-action](https://github.com/W3OSC/depenemy-action) GitHub Action — it continuously scans your dependencies on every push and pull request, and surfaces findings directly in your repository's Security tab. Create `.github/workflows/depenemy.yml` in your repository:
+The action ships inside this repository — no separate action repo needed. It continuously scans your dependencies on every push and pull request, and surfaces findings directly in your repository's **Security → Code Scanning** tab.
+
+Create `.github/workflows/supply-chain.yml` (or copy the [starter workflow](.github/workflow-templates/depenemy.yml)):
 
 ```yaml
-name: Depenemy scan
-on: [push, pull_request]
+name: Supply Chain Security
+on:
+  pull_request:
+    paths: ["package.json", "package-lock.json", "**/package.json"]
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  security-events: write
 
 jobs:
-  scan:
+  depenemy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
     steps:
       - uses: actions/checkout@v4
-      - uses: W3OSC/depenemy-action@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # optional - unlocks R001 and R006 checks
+          fetch-depth: 0
+
+      - name: Run depenemy
+        id: scan
+        uses: W3OSC/depenemy@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           fail-on: error
+          # approved-registries: "registry.npmjs.org,npm.mycompany.internal"
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif-file }}
+          category: depenemy
 ```
 
 Results appear automatically as [Code Scanning alerts](https://docs.github.com/en/code-security/code-scanning) in your Security tab on every push and pull request.
 <img width="1678" height="662" alt="image" src="https://github.com/user-attachments/assets/f19738dc-d029-483c-ae0f-e73a46bff7e3" />
+
+#### Action inputs
+
+| Input | Default | Description |
+|-------|---------|-------------|
+| `token` | `github.token` | GitHub token — unlocks R001 and R006 checks |
+| `paths` | `.` | Space-separated paths to scan |
+| `fail-on` | `error` | Minimum severity that fails the job: `error` \| `warning` \| `info` \| `never` |
+| `approved-registries` | `registry.npmjs.org` | Comma-separated approved npm registry hostnames. Packages from any other host trigger B006. |
+| `config` | — | Path to a `.depenemy.yml` file (overrides `approved-registries` when set) |
+| `ecosystems` | auto | Comma-separated ecosystems to scan: `npm`, `pypi`, `cargo` |
+| `upload-sarif` | `true` | Automatically upload SARIF to GitHub Code Scanning |
+
+#### Action outputs
+
+| Output | Description |
+|--------|-------------|
+| `sarif-file` | Path to the generated SARIF file |
+| `findings-count` | Total findings across all severity levels |
+| `errors-count` | Error-severity findings (the ones that block) |
+
+#### Docker variant
+
+For fully isolated, reproducible scans on Linux runners:
+
+```yaml
+      - uses: W3OSC/depenemy/action@v1
+        with:
+          approved-registries: "registry.npmjs.org"
+          fail-on: error
+          token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+The Docker variant (`action/`) builds from source and includes all rules. The composite variant (repo root) installs depenemy from PyPI.
 
 ---
 
