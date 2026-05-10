@@ -241,8 +241,16 @@ pytest --no-cov -q
 
 ---
 
-## License
+## Contributions
 
-MIT - see [LICENSE](LICENSE)
+> **📢 Contributing to W3OS**
+>
+> W3OS is an open standard developed collaboratively by the Web3 security community. Contributions by anyone are welcome.
+>
+> - 📖 **Read the [Contributing Guide](CONTRIBUTING.md)** for detailed information on how to propose changes, add new sections, and improve existing content
+> - 💬 **Join the [Telegram Discussion Group](https://t.me/+yhmMnY2DyNBmNDlh)** to participate in ongoing collaboration and connect with other contributors
+>
+> _Help build the comprehensive operational security standard for Web3 organizations._
+
 
 
