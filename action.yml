@@ -32,9 +32,12 @@ inputs:
     required: false
     default: ""
   upload-sarif:
-    description: Automatically upload SARIF to GitHub Code Scanning
+    description: >
+      Automatically upload SARIF to GitHub Code Scanning.
+      Requires GitHub Advanced Security (GHAS) to be enabled on the repository.
+      Set to 'false' if you want to handle the upload yourself or if GHAS is not available.
     required: false
-    default: "true"
+    default: "false"
   approved-registries:
     description: >
       Comma-separated list of approved npm registry hostnames.
@@ -119,7 +122,7 @@ runs:
         echo "sarif-file=${{ inputs.output-sarif }}" >> "$GITHUB_OUTPUT"
 
     - name: Upload SARIF to GitHub Code Scanning
-      if: inputs.upload-sarif == 'true' && always()
+      if: ${{ inputs.upload-sarif == 'true' }}
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: ${{ inputs.output-sarif }}
