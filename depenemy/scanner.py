@@ -26,6 +26,9 @@ from depenemy.types import Dependency, Ecosystem, Finding, PackageMetadata, Scan
 
 _CONCURRENCY = 10  # max parallel registry requests
 
+# Rules whose findings contribute to the C001 composite risk score.
+_C001_CONTRIBUTING_RULES = {"S007", "S008", "S009", "R003", "R004", "R006"}
+
 
 async def scan(paths: list[Path], config: Config) -> ScanResult:
     """Full scan pipeline: parse → fetch → evaluate → return results."""
@@ -165,7 +168,6 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
     # 6. C001 — Composite supply-chain risk score.
     #    After all per-dep findings are collected, aggregate contributing signal counts
     #    per package. If a package accumulates enough signals, emit a C001 BLOCK finding.
-    _C001_CONTRIBUTING_RULES = {"S007", "S008", "S009", "R003", "R004", "R006"}
     package_signals: dict[tuple[str, str], set[str]] = {}
     for finding in findings:
         dep_key = (finding.dependency.name, finding.dependency.ecosystem.value)
