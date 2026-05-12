@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import timezone
 from typing import Any, Optional
 
 import httpx
@@ -80,6 +81,20 @@ class NpmFetcher(BaseFetcher):
         maintainers = data.get("maintainers", [])
         maintainer_count = len(maintainers)
 
+        # Provenance (S006): check dist.attestations on the target version
+        dist_info = target_info.get("dist", {})
+        has_provenance = bool(dist_info.get("attestations"))
+        registry_integrity: Optional[str] = dist_info.get("integrity") or None
+
+        # Publisher name (S009): npm account that published target_version
+        npm_user = target_info.get("_npmUser", {})
+        publisher_name: Optional[str] = npm_user.get("name") if isinstance(npm_user, dict) else None
+
+        # Bulk publish burst (S008): count packages published by this author in a 48h window
+        author_package_burst_count = 0
+        if publisher_name:
+            author_package_burst_count = await self._fetch_bulk_publish_burst(publisher_name)
+
         serializable = {
             "latest": latest,
             "target": target,
@@ -94,6 +109,10 @@ class NpmFetcher(BaseFetcher):
             "repo_url": repo_url,
             "maintainer_count": maintainer_count,
             "maintainers": [m.get("name", "") for m in maintainers if isinstance(m, dict)],
+            "has_provenance": has_provenance,
+            "registry_integrity": registry_integrity,
+            "publisher_name": publisher_name,
+            "author_package_burst_count": author_package_burst_count,
         }
         self._cache.set(cache_key, serializable)
 
@@ -112,6 +131,10 @@ class NpmFetcher(BaseFetcher):
             deprecation_message=str(deprecated_msg) if is_deprecated else "",
             has_install_scripts=has_install_scripts,
             license=license_val or None,
+            has_provenance=has_provenance,
+            registry_integrity=registry_integrity,
+            publisher_name=publisher_name,
+            author_package_burst_count=author_package_burst_count,
         )
 
     async def _fetch_downloads(self, name: str) -> tuple[int, int]:
@@ -133,6 +156,55 @@ class NpmFetcher(BaseFetcher):
 
         self._cache.set(cache_key, {"weekly": weekly, "total": total})
         return weekly, total
+
+    async def _fetch_bulk_publish_burst(self, publisher_name: str) -> int:
+        """Return the max number of packages published by publisher in any 48-hour window."""
+        cache_key = f"npm:burst:{publisher_name}"
+        cached = self._cache.get(cache_key)
+        if cached is not None:
+            return int(cached)
+
+        try:
+            resp = await self._client.get(
+                f"{self.REGISTRY}/-/v1/search",
+                params={"text": f"maintainer:{publisher_name}", "size": "250"},
+                timeout=15,
+            )
+            if resp.status_code != 200:
+                self._cache.set(cache_key, 0)
+                return 0
+            data = resp.json()
+        except (httpx.HTTPError, json.JSONDecodeError):
+            self._cache.set(cache_key, 0)
+            return 0
+
+        objects = data.get("objects", [])
+        timestamps: list[float] = []
+        for obj in objects:
+            pkg_data = obj.get("package", {})
+            date_str = pkg_data.get("date", "")
+            dt = parse_date(date_str)
+            if dt:
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                timestamps.append(dt.timestamp())
+
+        if not timestamps:
+            self._cache.set(cache_key, 0)
+            return 0
+
+        timestamps.sort()
+        window_secs = 48 * 3600
+        max_in_window = 1
+        for i, ts in enumerate(timestamps):
+            count = sum(1 for t in timestamps[i:] if t - ts <= window_secs)
+            if count > max_in_window:
+                max_in_window = count
+
+        # Subtract 1 because the package being scanned is counted in the window itself
+        burst = max(0, max_in_window - 1)
+        self._cache.set(cache_key, burst)
+        return burst
 
 
 async def _parallel_get(
@@ -173,4 +245,8 @@ def _from_cache(data: dict[str, Any], dep: Dependency) -> PackageMetadata:
         deprecation_message=data.get("deprecation_message", ""),
         has_install_scripts=data.get("has_install_scripts", False),
         license=data.get("license") or None,
+        has_provenance=data.get("has_provenance", False),
+        registry_integrity=data.get("registry_integrity"),
+        publisher_name=data.get("publisher_name"),
+        author_package_burst_count=data.get("author_package_burst_count", 0),
     )

@@ -6,6 +6,9 @@ from depenemy.rules.behavioral import (
     B002Unpinned,
     B003LaggingVersion,
     B004EnforceLockfile,
+    B005HashMismatch,
+    B006BadRegistry,
+    B007LockfileInjection,
 )
 from depenemy.rules.reputation import (
     R001YoungAuthor,
@@ -25,6 +28,10 @@ from depenemy.rules.supply_chain import (
     S003ArchivedRepo,
     S004DependencyConfusion,
     S005MaliciousPackage,
+    S006MissingProvenance,
+    S007GhostRepo,
+    S008BulkPublish,
+    S009IdentityMismatch,
 )
 
 ALL_RULES: list[BaseRule] = [
@@ -32,6 +39,9 @@ ALL_RULES: list[BaseRule] = [
     B002Unpinned(),
     B003LaggingVersion(),
     B004EnforceLockfile(),
+    B005HashMismatch(),
+    B006BadRegistry(),
+    B007LockfileInjection(),
     R001YoungAuthor(),
     R002YoungPackage(),
     R003LowWeeklyDownloads(),
@@ -47,6 +57,10 @@ ALL_RULES: list[BaseRule] = [
     S003ArchivedRepo(),
     S004DependencyConfusion(),
     S005MaliciousPackage(),
+    S006MissingProvenance(),
+    S007GhostRepo(),
+    S008BulkPublish(),
+    S009IdentityMismatch(),
 ]
 
 __all__ = ["ALL_RULES", "BaseRule"]
