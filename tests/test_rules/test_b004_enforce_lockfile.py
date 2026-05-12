@@ -73,12 +73,12 @@ if _HAS_PYTEST:
             )
             assert len(findings) == 1
 
-        def test_severity_is_warning_by_default(self, rule, default_config, tmp_path):
+        def test_severity_is_error_by_default(self, rule, default_config, tmp_path):
             from depenemy.types import Severity
             manifest = tmp_path / "package.json"
             manifest.write_text("{}")
             findings = rule.check_project(manifest, [_dep("x", str(manifest))], default_config)
-            assert findings[0].severity == Severity.WARNING
+            assert findings[0].severity == Severity.ERROR
 
         def test_message_lists_acceptable_lockfiles(self, rule, default_config, tmp_path):
             manifest = tmp_path / "package.json"
