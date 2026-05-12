@@ -252,5 +252,8 @@ pytest --no-cov -q
 >
 > _Help build the comprehensive operational security standard for Web3 organizations._
 
+---
 
+## License
 
+MIT - see [LICENSE](LICENSE)
