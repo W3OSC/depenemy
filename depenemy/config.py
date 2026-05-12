@@ -47,7 +47,7 @@ DEFAULT_RULES: dict[str, Severity] = {
     "B001": Severity.WARNING,  # range specifier - hygiene
     "B002": Severity.ERROR,    # completely unpinned - active risk
     "B003": Severity.WARNING,  # lagging version - hygiene, CVEs caught by R007
-    "B004": Severity.ERROR,    # missing lockfile - active risk, fresh installs re-resolve
+    "B004": Severity.WARNING,  # missing lockfile - missing defense, not active vulnerability
     "B005": Severity.ERROR,    # hash mismatch - confirmed tampering
     "B006": Severity.ERROR,    # bad registry - confirmed redirect
     "B007": Severity.ERROR,    # lockfile injection - non-registry protocol
