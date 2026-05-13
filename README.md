@@ -10,6 +10,7 @@ Depenemy scans your project for supply chain risks, behavioral issues, and reput
 [![PyPI](https://img.shields.io/pypi/v/depenemy)](https://pypi.org/project/depenemy/)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub Marketplace](https://img.shields.io/badge/GitHub%20Actions-Get%20Action-2088FF?logo=github-actions&logoColor=white)](https://github.com/marketplace/actions/depenemy-dependency-scanner)
 
 </div>
 
