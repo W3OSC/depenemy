@@ -33,6 +33,8 @@ class Thresholds:
     max_version_lag: int = 10
     typosquatting_distance: int = 1
     min_version_age_days: int = 7
+    # No release cooldown configured (B008)
+    min_release_cooldown_days: int = 7
     # Ghost repository (S007)
     ghost_repo_max_commits: int = 2
     # Bulk publish burst (S008)
@@ -51,6 +53,7 @@ DEFAULT_RULES: dict[str, Severity] = {
     "B005": Severity.ERROR,    # hash mismatch - confirmed tampering
     "B006": Severity.ERROR,    # bad registry - confirmed redirect
     "B007": Severity.ERROR,    # lockfile injection - non-registry protocol
+    "B008": Severity.WARNING,  # no release cooldown configured - missing defense
     # Reputation
     "R001": Severity.WARNING,  # young author - signal, not proof
     "R002": Severity.WARNING,  # new package - signal, not proof
@@ -129,6 +132,8 @@ def load_config(path: Optional[Path] = None) -> Config:
             min_contributors=t.get("min_contributors", defaults.min_contributors),
             max_version_lag=t.get("max_version_lag", defaults.max_version_lag),
             typosquatting_distance=t.get("typosquatting_distance", defaults.typosquatting_distance),
+            min_version_age_days=t.get("min_version_age_days", defaults.min_version_age_days),
+            min_release_cooldown_days=t.get("min_release_cooldown_days", defaults.min_release_cooldown_days),
             ghost_repo_max_commits=t.get("ghost_repo_max_commits", defaults.ghost_repo_max_commits),
             bulk_publish_window_hours=t.get("bulk_publish_window_hours", defaults.bulk_publish_window_hours),
             bulk_publish_min_packages=t.get("bulk_publish_min_packages", defaults.bulk_publish_min_packages),

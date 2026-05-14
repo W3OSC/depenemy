@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-05-14
+
+### Added
+- B008: No release cooldown configured (Warning). Project-level rule that flags repos lacking a Dependabot `cooldown.default-days`, Renovate `minimumReleaseAge`, or pnpm cooldown (`.npmrc` `minimum-release-age`, `pnpm-workspace.yaml` `minimumReleaseAge`, or `package.json` `pnpm.minimumReleaseAge`) of at least `min_release_cooldown_days` (default 7). Walks up from each manifest to repo root.
+- `min_release_cooldown_days` threshold in `.depenemy.yml`.
+- `min_version_age_days` threshold now honored when set in `.depenemy.yml` (was silently ignored before).
+
+### Fixed
+- R010 / R002 for PyPI: `PackageMetadata.published_at` now reflects the target version's upload date, not the package's first-ever upload. Previously, a fresh version of a long-established PyPI package never tripped R010 (false negative). npm behavior unchanged.
+
+### Changed
+- `.depenemy.yml` shipped with this repo no longer hardcodes the `rules:` block. Falls back to `DEFAULT_RULES` so every shipped rule is auto-enabled at its default severity, eliminating drift when new rules are added.
+
 ## [0.1.5] - 2026-05-14
 
 ### Added

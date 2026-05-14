@@ -5,6 +5,7 @@ from depenemy.rules.behavioral.b004_enforce_lockfile import B004EnforceLockfile
 from depenemy.rules.behavioral.b005_hash_mismatch import B005HashMismatch
 from depenemy.rules.behavioral.b006_bad_registry import B006BadRegistry
 from depenemy.rules.behavioral.b007_lockfile_injection import B007LockfileInjection
+from depenemy.rules.behavioral.b008_no_release_cooldown import B008NoReleaseCooldown
 
 __all__ = [
     "B001RangeSpecifier",
@@ -14,4 +15,5 @@ __all__ = [
     "B005HashMismatch",
     "B006BadRegistry",
     "B007LockfileInjection",
+    "B008NoReleaseCooldown",
 ]

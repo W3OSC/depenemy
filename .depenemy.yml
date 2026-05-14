@@ -11,25 +11,9 @@ thresholds:
   max_version_lag: 10           # how many minor versions behind is too old
   typosquatting_distance: 1     # max edit distance to flag as typosquatting
 
-rules:
-  B001: warning  # range specifier (^, ~, >=, *) - hygiene
-  B002: error    # no version pinned - active risk
-  B003: warning  # lagging version - hygiene, CVEs caught by R007
-  B004: warning  # missing lockfile - missing defense, not active vulnerability
-  R001: warning  # young author account - signal, not proof
-  R002: warning  # young package - signal, not proof
-  R003: warning  # low weekly downloads - signal
-  R004: warning  # low total downloads - signal
-  R005: warning  # stale package - maintenance issue, not active threat
-  R006: warning  # few contributors - signal
-  R007: error    # target version below known security patch - active threat
-  R008: warning  # deprecated - should migrate, not urgent
-  R009: warning  # typosquatting suspected - signal
-  S001: error    # install scripts present - executes code on install
-  S002: warning  # no source repository linked - hygiene
-  S003: warning  # source repository archived - maintenance issue
-  S004: warning  # dependency confusion - signal
-  S005: error    # known malicious package history in OSV - active threat
+# `rules:` block intentionally omitted - falls back to DEFAULT_RULES in code
+# so every shipped rule is auto-enabled at its default severity. Override
+# individual rules here only when you need to deviate from the shipped defaults.
 
 # Packages to ignore (with reason)
 ignore: []

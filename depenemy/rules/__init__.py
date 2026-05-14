@@ -9,6 +9,7 @@ from depenemy.rules.behavioral import (
     B005HashMismatch,
     B006BadRegistry,
     B007LockfileInjection,
+    B008NoReleaseCooldown,
 )
 from depenemy.rules.reputation import (
     R001YoungAuthor,
@@ -42,6 +43,7 @@ ALL_RULES: list[BaseRule] = [
     B005HashMismatch(),
     B006BadRegistry(),
     B007LockfileInjection(),
+    B008NoReleaseCooldown(),
     R001YoungAuthor(),
     R002YoungPackage(),
     R003LowWeeklyDownloads(),

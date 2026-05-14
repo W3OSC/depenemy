@@ -34,6 +34,7 @@ Depenemy gives you **a single command** that audits all your dependencies across
 | B002 | No version pinned | No version specified at all | Error |
 | B003 | Lagging version | Pinned version is significantly behind latest | Warning |
 | B004 | Lockfile missing | Manifest has no adjacent lockfile - fresh installs re-resolve every time | Warning |
+| B008 | No release cooldown configured | Project has no Dependabot/Renovate/pnpm cooldown config blocking fresh package versions | Warning |
 
 ### Reputation signals
 
