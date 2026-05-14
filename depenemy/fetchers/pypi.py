@@ -40,13 +40,10 @@ class PyPIFetcher(BaseFetcher):
         latest = info.get("version", "")
         target = dep.resolved_version or dep.version_spec.lstrip("^~>=<! ").split(",")[0] or latest
 
-        # Package creation date = earliest release ever published
+        # Target version publish date (per PackageMetadata schema: when target_version was published)
         releases: dict[str, list[dict[str, Any]]] = data.get("releases", {})
-        all_dates = [
-            d for files in releases.values()
-            for d in [_earliest_upload(files)] if d
-        ]
-        published_at = min(all_dates) if all_dates else None
+        target_files = releases.get(target, [])
+        published_at = _earliest_upload(target_files)
 
         # Latest version publish date
         latest_files = releases.get(latest, [])
