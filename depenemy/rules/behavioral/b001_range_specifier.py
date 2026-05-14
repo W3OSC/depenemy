@@ -29,6 +29,14 @@ class B001RangeSpecifier(BaseRule):
     ) -> Optional[Finding]:
         if dep.is_dev:
             return None  # ranges are standard practice for dev/build tools
+        manifest = dep.location.file.rsplit("/", 1)[-1] if dep.location else ""
+        if manifest == "pyproject.toml":
+            # pyproject.toml declares a library's consumer-facing compatibility
+            # range. Exact pinning here breaks downstream pip resolution when
+            # two libraries pin different exact versions of a shared transitive.
+            # Reproducibility belongs to the lockfile (uv.lock / poetry.lock),
+            # and B004 already enforces its presence.
+            return None
         spec = dep.version_spec.strip()
         if spec.startswith("workspace:"):
             return None  # monorepo local package reference, not a registry range

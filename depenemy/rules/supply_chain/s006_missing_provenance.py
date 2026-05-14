@@ -26,6 +26,11 @@ class S006MissingProvenance(BaseRule):
         meta: PackageMetadata,
         config: Config,
     ) -> Optional[Finding]:
+        if meta.has_provenance is None:
+            # The fetcher for this ecosystem doesn't probe provenance yet
+            # (e.g. PyPI PEP 740 support is unimplemented). Treat as unknown,
+            # not absent - firing would be a blanket false positive.
+            return None
         if meta.has_provenance:
             return None
 

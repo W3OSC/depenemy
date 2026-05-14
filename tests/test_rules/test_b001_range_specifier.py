@@ -94,6 +94,34 @@ if _HAS_PYTEST:
             dep = make_dep("express", "^4.18.2")
             assert rule.check(dep, make_meta("express"), config) is None
 
+        @pytest.mark.parametrize("spec", [">=0.27.0", "^1.0.0", "~1.0.0", ">=1.0,<2.0"])
+        def test_skipped_for_pyproject_toml_library_context(self, rule, default_config, spec):
+            # pyproject.toml declares library compatibility ranges; pinning would
+            # break downstream pip resolution. Lockfile (uv.lock/poetry.lock) owns
+            # exact pins and B004 enforces lockfile presence.
+            dep = make_dep("httpx", spec, file="pyproject.toml")
+            assert rule.check(dep, make_meta("httpx"), default_config) is None
+
+        @pytest.mark.parametrize("spec", [">=0.27.0", "^1.0.0", "~1.0.0"])
+        def test_still_fires_for_requirements_txt(self, rule, default_config, spec):
+            # requirements.txt is an application pin file - ranges remain risky.
+            dep = make_dep("httpx", spec, file="requirements.txt")
+            finding = rule.check(dep, make_meta("httpx"), default_config)
+            assert finding is not None
+            assert finding.rule_id == "B001"
+
+        def test_still_fires_for_pipfile(self, rule, default_config):
+            # Pipfile is an application manifest - Pipfile.lock holds the pins.
+            dep = make_dep("httpx", ">=0.27.0", file="Pipfile")
+            finding = rule.check(dep, make_meta("httpx"), default_config)
+            assert finding is not None
+            assert finding.rule_id == "B001"
+
+        def test_skipped_for_nested_pyproject_toml(self, rule, default_config):
+            # Walks the basename so a nested path still trips the library guard.
+            dep = make_dep("httpx", ">=0.27.0", file="packages/lib/pyproject.toml")
+            assert rule.check(dep, make_meta("httpx"), default_config) is None
+
     class TestB001CoverageGaps:
         """Documents known detection gaps - these assert CURRENT behavior."""
 

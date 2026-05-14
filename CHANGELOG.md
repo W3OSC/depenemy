@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- B001: skip `pyproject.toml`; ranges are correct for libraries.
+- S007: skip when GitHub fetch failed (`repo_created_at is None`).
+- S006: `has_provenance` is `Optional[bool]`; fire only on explicit False.
+
 ## [0.1.6] - 2026-05-14
 
 ### Added

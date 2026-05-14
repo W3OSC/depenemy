@@ -30,6 +30,14 @@ class TestS006MissingProvenance(unittest.TestCase):
         meta.has_provenance = True
         self.assertIsNone(self.rule.check(self.dep, meta, self.cfg))
 
+    def test_skips_when_provenance_not_checked(self) -> None:
+        # None = the fetcher for this ecosystem doesn't probe provenance yet
+        # (e.g. PyPI - PEP 740 support is unimplemented). Firing would be a
+        # blanket false positive across the entire ecosystem.
+        meta = make_meta("pkg")
+        meta.has_provenance = None
+        self.assertIsNone(self.rule.check(self.dep, meta, self.cfg))
+
 
 class TestS007GhostRepo(unittest.TestCase):
     def setUp(self) -> None:
@@ -38,22 +46,26 @@ class TestS007GhostRepo(unittest.TestCase):
         self.cfg = Config()
 
     def _meta(self, commits: int, issues: int, prs: int, has_ci: bool) -> object:
+        from datetime import datetime, timezone
         m = make_meta("pkg")
         m.repo_commit_count = commits
         m.repo_issue_count = issues
         m.repo_pr_count = prs
         m.repo_has_ci = has_ci
+        # Setting repo_created_at marks the GitHub fetch as successful;
+        # without it S007 now treats the repo as "unknown" and skips.
+        m.repo_created_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
         return m
 
     def test_flags_ghost_repo(self) -> None:
-        # 0 commits, 0 issues, no CI — ghost
+        # 0 commits, 0 issues, no CI - ghost
         meta = self._meta(0, 0, 0, False)
         result = self.rule.check(self.dep, meta, self.cfg)
         self.assertIsNotNone(result)
         self.assertEqual(result.rule_id, "S007")
 
     def test_flags_few_commits_no_ci(self) -> None:
-        # 1 commit (< threshold of 2), has activity, no CI — 2 signals (commits + no CI)
+        # 1 commit (< threshold of 2), has activity, no CI - 2 signals (commits + no CI)
         meta = self._meta(1, 10, 5, False)
         result = self.rule.check(self.dep, meta, self.cfg)
         self.assertIsNotNone(result)
@@ -67,8 +79,21 @@ class TestS007GhostRepo(unittest.TestCase):
         self.assertIsNone(self.rule.check(self.dep, meta, self.cfg))
 
     def test_one_ghost_signal_not_enough(self) -> None:
-        # Only 1 signal (no CI) — should not fire
+        # Only 1 signal (no CI) - should not fire
         meta = self._meta(100, 50, 30, False)
+        self.assertIsNone(self.rule.check(self.dep, meta, self.cfg))
+
+    def test_skips_when_github_fetch_failed(self) -> None:
+        # GitHub fetcher returned no data (no token, rate limited, 404, private).
+        # All signal fields remain at default zeros and repo_created_at stays None.
+        # Firing here would be a false positive against legitimate packages
+        # (typer, httpx, etc.) whose repos depenemy simply couldn't read.
+        meta = make_meta("pkg")
+        meta.repo_commit_count = 0
+        meta.repo_issue_count = 0
+        meta.repo_pr_count = 0
+        meta.repo_has_ci = False
+        meta.repo_created_at = None
         self.assertIsNone(self.rule.check(self.dep, meta, self.cfg))
 
 

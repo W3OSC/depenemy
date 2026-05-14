@@ -245,7 +245,7 @@ def _from_cache(data: dict[str, Any], dep: Dependency) -> PackageMetadata:
         deprecation_message=data.get("deprecation_message", ""),
         has_install_scripts=data.get("has_install_scripts", False),
         license=data.get("license") or None,
-        has_provenance=data.get("has_provenance", False),
+        has_provenance=data.get("has_provenance"),
         registry_integrity=data.get("registry_integrity"),
         publisher_name=data.get("publisher_name"),
         author_package_burst_count=data.get("author_package_burst_count", 0),

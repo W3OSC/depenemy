@@ -18,7 +18,7 @@ class S007GhostRepo(BaseRule):
     name = "Ghost repository"
     description = (
         "The linked GitHub repository has very few commits, no issues, no pull requests, "
-        "and no CI configuration — a strong indicator the repo was created as a facade "
+        "and no CI configuration - a strong indicator the repo was created as a facade "
         "to make the package appear legitimate while the real malicious payload is "
         "embedded in the npm tarball."
     )
@@ -31,6 +31,12 @@ class S007GhostRepo(BaseRule):
     ) -> Optional[Finding]:
         if not meta.repository_url:
             return None  # S002 covers missing repo separately
+
+        if meta.repo_created_at is None:
+            # GitHub fetcher couldn't load this repo (no token, rate limit,
+            # 404, or private). The default zero/false signals are "unknown"
+            # not "ghost" - firing here would be a false positive.
+            return None
 
         max_commits = config.thresholds.ghost_repo_max_commits
 
