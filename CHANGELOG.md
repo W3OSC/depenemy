@@ -7,9 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-05-14
+
 ### Added
-- B004: Enforce lockfile - flags manifests with no adjacent lockfile (Error). Supports `package.json`/`Pipfile`/`pyproject.toml`/`Cargo.toml`; `requirements*.txt` skipped (it is itself a pin source).
+- B004: Enforce lockfile - flags manifests with no adjacent lockfile (Warning). Supports `package.json`/`Pipfile`/`pyproject.toml`/`Cargo.toml`; `requirements*.txt` skipped (it is itself a pin source).
 - `BaseRule.check_project()` hook for project-level rules that operate on a manifest as a whole.
+- B005: Lockfile integrity hash mismatch - detects tarball tampering (Error).
+- B006: Package resolved from unapproved/unknown registry (Error).
+- B007: Lockfile injection - resolved URL path doesn't match package name (Error).
+- S006: Missing Sigstore provenance attestation (Warning).
+- S007: Ghost repository - facade repo with minimal activity (Warning).
+- S008: Bulk publish burst - attacker registering many packages rapidly (Warning).
+- S009: Publisher/GitHub identity mismatch - account takeover signal (Warning).
+- C001: Composite supply-chain risk score - fires when a package accumulates ≥4 independent signals from {S007, S008, S009, R003, R004, R006} (Error).
+- npm parser extracts `integrity` and `resolved` fields from lockfile v2/v3.
+- npm fetcher pulls `registry_integrity`, `has_provenance`, `publisher_name`, and `author_package_burst_count` from the registry API.
+- GitHub fetcher pulls `repo_commit_count`, `repo_issue_count`, `repo_pr_count`, `repo_has_ci`, and `publisher_has_github` signals.
+- Configurable thresholds: `ghost_repo_max_commits`, `bulk_publish_window_hours`, `bulk_publish_min_packages`, `composite_score_threshold`, and `approved_registries` list.
+- README: contributions section with collaboration guidelines.
 
 ## [0.1.4] - 2026-04-16
 
