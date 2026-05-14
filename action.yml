@@ -28,7 +28,7 @@ inputs:
     required: false
     default: ""
   ecosystems:
-    description: Comma-separated list of ecosystems to scan (npm,pypi,cargo) — default is auto-detect
+    description: Comma-separated list of ecosystems to scan (npm,pypi,cargo) - default is auto-detect
     required: false
     default: ""
   upload-sarif:
