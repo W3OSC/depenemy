@@ -49,6 +49,11 @@ class PyPIFetcher(BaseFetcher):
         latest_files = releases.get(latest, [])
         last_published_at = _earliest_upload(latest_files)
 
+        # Package's first-ever publish date (R002): min upload across every release.
+        first_published_at = _earliest_upload(
+            [f for files in releases.values() for f in files]
+        )
+
         # Downloads (PyPI doesn't provide total downloads in the JSON API -
         # BigQuery is needed for that; we use 0 as placeholder)
         weekly_downloads = 0
@@ -75,6 +80,7 @@ class PyPIFetcher(BaseFetcher):
             "target": target,
             "published_at": published_at.isoformat() if published_at else None,
             "last_published_at": last_published_at.isoformat() if last_published_at else None,
+            "first_published_at": first_published_at.isoformat() if first_published_at else None,
             "weekly_downloads": weekly_downloads,
             "total_downloads": total_downloads,
             "is_deprecated": is_deprecated,
@@ -94,6 +100,7 @@ class PyPIFetcher(BaseFetcher):
             target_version=target,
             published_at=published_at,
             last_published_at=last_published_at,
+            first_published_at=first_published_at,
             weekly_downloads=weekly_downloads,
             total_downloads=total_downloads,
             maintainer_count=maintainer_count,
@@ -144,6 +151,7 @@ def _from_cache(data: dict[str, Any], dep: Dependency) -> PackageMetadata:
         target_version=data["target"],
         published_at=parse_date(data.get("published_at")),
         last_published_at=parse_date(data.get("last_published_at")),
+        first_published_at=parse_date(data.get("first_published_at")),
         weekly_downloads=data.get("weekly_downloads", 0),
         total_downloads=data.get("total_downloads", 0),
         maintainer_count=data.get("maintainer_count", 0),

@@ -57,12 +57,21 @@ class TestR002YoungPackage(unittest.TestCase):
 
     def test_flags_young_package(self) -> None:
         meta = make_meta("test-pkg")
-        meta.published_at = _ago(30)
+        meta.first_published_at = _ago(30)
         self.assertIsNotNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
     def test_passes_old_package(self) -> None:
         meta = make_meta("test-pkg")
-        meta.published_at = _ago(400)
+        meta.first_published_at = _ago(400)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
+
+    def test_does_not_flag_old_package_with_fresh_target_version(self) -> None:
+        # Regression: R002 used to read published_at (target-version-scoped),
+        # which falsely flagged decade-old packages like svelte as "3 days
+        # old" whenever the user pinned a freshly-published security fix.
+        meta = make_meta("test-pkg")
+        meta.first_published_at = _ago(3650)  # package: 10 years old
+        meta.published_at = _ago(3)           # target version: 3 days old
         self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
 

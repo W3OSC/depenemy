@@ -70,6 +70,7 @@ class PackageMetadata:
     target_version: str        # The version actually being analysed
     published_at: Optional[datetime] = None        # When target_version was published
     last_published_at: Optional[datetime] = None   # When latest_version was published
+    first_published_at: Optional[datetime] = None  # When the package's earliest version was published (R002)
     weekly_downloads: int = 0
     total_downloads: int = 0
     author_name: Optional[str] = None

@@ -76,6 +76,7 @@ class NpmFetcher(BaseFetcher):
         times = data.get("time", {})
         published_at = parse_date(times.get(target) or times.get("created"))  # when target version was published
         last_published_at = parse_date(times.get(latest))
+        first_published_at = parse_date(times.get("created"))  # when the package itself was first published (R002)
 
         # Maintainers
         maintainers = data.get("maintainers", [])
@@ -100,6 +101,7 @@ class NpmFetcher(BaseFetcher):
             "target": target,
             "published_at": published_at.isoformat() if published_at else None,
             "last_published_at": last_published_at.isoformat() if last_published_at else None,
+            "first_published_at": first_published_at.isoformat() if first_published_at else None,
             "weekly_downloads": weekly,
             "total_downloads": total,
             "is_deprecated": is_deprecated,
@@ -123,6 +125,7 @@ class NpmFetcher(BaseFetcher):
             target_version=target,
             published_at=published_at,
             last_published_at=last_published_at,
+            first_published_at=first_published_at,
             weekly_downloads=weekly,
             total_downloads=total,
             maintainer_count=maintainer_count,
@@ -237,6 +240,7 @@ def _from_cache(data: dict[str, Any], dep: Dependency) -> PackageMetadata:
         target_version=data["target"],
         published_at=parse_date(data.get("published_at")),
         last_published_at=parse_date(data.get("last_published_at")),
+        first_published_at=parse_date(data.get("first_published_at")),
         weekly_downloads=data.get("weekly_downloads", 0),
         total_downloads=data.get("total_downloads", 0),
         maintainer_count=data.get("maintainer_count", 0),

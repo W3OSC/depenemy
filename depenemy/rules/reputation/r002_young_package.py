@@ -26,11 +26,14 @@ class R002YoungPackage(BaseRule):
     ) -> Optional[Finding]:
         if dep.is_dev:
             return None
-        if not meta.published_at:
+        # R002 measures *package* age, not target-version age - those are R010's
+        # concerns and use a separate threshold. published_at is target-scoped
+        # per the type contract, so we must use first_published_at here.
+        if not meta.first_published_at:
             return None
 
         now = datetime.now(timezone.utc)
-        published = meta.published_at
+        published = meta.first_published_at
         if published.tzinfo is None:
             published = published.replace(tzinfo=timezone.utc)
 
