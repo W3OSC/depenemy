@@ -84,6 +84,10 @@ class PackageMetadata:
     is_archived: bool = False
     advisories: list[Advisory] = field(default_factory=list)
     malicious_advisories: list[Advisory] = field(default_factory=list)
+    # Versions OSV records as security fixes for this package (any `fixed` event
+    # across all advisories). Used by R010 to bypass the cooldown when the user
+    # has landed on a known fix, even if it was published recently.
+    security_fix_versions: set[str] = field(default_factory=set)
     # Provenance (S006). None = fetcher did not check this ecosystem yet; False
     # = checked and absent; True = checked and present. S006 fires only on False.
     has_provenance: Optional[bool] = None

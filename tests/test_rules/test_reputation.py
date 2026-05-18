@@ -15,6 +15,7 @@ from depenemy.rules.reputation import (
     R006FewContributors,
     R007BelowSecurityPatch,
     R008Deprecated,
+    R010RecentlyPublishedVersion,
 )
 from depenemy.types import Advisory
 from tests.conftest import make_dep, make_meta
@@ -139,6 +140,39 @@ class TestR007BelowSecurityPatch(unittest.TestCase):
             Advisory(id="GHSA-test", severity="high", affected_range="<1.2.0", patched_version="1.2.0")
         ]
         self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
+
+
+class TestR010RecentlyPublishedVersion(unittest.TestCase):
+    rule = R010RecentlyPublishedVersion()
+
+    def test_flags_recently_published(self) -> None:
+        meta = make_meta("test-pkg", target_version="1.0.0")
+        meta.published_at = _ago(2)
+        result = self.rule.check(_dep(), meta, Config())  # type: ignore[arg-type]
+        self.assertIsNotNone(result)
+        self.assertEqual(result.rule_id, "R010")  # type: ignore[union-attr]
+
+    def test_passes_old_enough(self) -> None:
+        meta = make_meta("test-pkg", target_version="1.0.0")
+        meta.published_at = _ago(30)
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
+
+    def test_skips_when_target_is_security_fix(self) -> None:
+        # A version published 2 days ago would normally trip R010, but if OSV
+        # records it as the `fixed` version for a CVE affecting earlier
+        # versions, we want users to adopt it without the cooldown nag.
+        meta = make_meta("test-pkg", target_version="1.0.1")
+        meta.published_at = _ago(2)
+        meta.security_fix_versions = {"1.0.1"}
+        self.assertIsNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
+
+    def test_fires_when_recent_version_is_not_in_fix_set(self) -> None:
+        # Regression: only the exact fix versions get the carve-out - a
+        # different recent version of the same package still gets flagged.
+        meta = make_meta("test-pkg", target_version="1.0.2")
+        meta.published_at = _ago(2)
+        meta.security_fix_versions = {"1.0.1"}
+        self.assertIsNotNone(self.rule.check(_dep(), meta, Config()))  # type: ignore[arg-type]
 
 
 class TestR008Deprecated(unittest.TestCase):

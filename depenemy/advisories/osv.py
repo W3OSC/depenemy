@@ -82,6 +82,52 @@ class OSVAdvisor:
         ])
         return advisories
 
+    async def get_fixed_versions(self, name: str, ecosystem: Ecosystem) -> set[str]:
+        """Return every version OSV records as a `fixed` event for this package.
+
+        Queries OSV without a version filter so we see advisories across the
+        whole package history, then collects every SEMVER `fixed` event.
+        Used by R010 to recognize that a freshly-published version is the
+        security fix for an earlier vulnerable version and skip the cooldown
+        warning for it.
+        """
+        osv_ecosystem = _ECOSYSTEM_MAP.get(ecosystem)
+        if not osv_ecosystem:
+            return set()
+
+        cache_key = f"osv:fixed:{osv_ecosystem}:{name}"
+        cached = self._cache.get(cache_key)
+        if cached is not None:
+            return set(cached)
+
+        payload = {"package": {"name": name, "ecosystem": osv_ecosystem}}
+        try:
+            resp = await self._client.post(
+                f"{self.API}/query",
+                json=payload,
+                timeout=10,
+            )
+            if resp.status_code != 200:
+                self._cache.set(cache_key, [])
+                return set()
+            data = resp.json()
+        except (httpx.HTTPError, json.JSONDecodeError):
+            return set()
+
+        fixed: set[str] = set()
+        for vuln in data.get("vulns", []):
+            for affected in vuln.get("affected", []):
+                for r in affected.get("ranges", []):
+                    if r.get("type") != "SEMVER":
+                        continue
+                    for event in r.get("events", []):
+                        v = event.get("fixed")
+                        if v:
+                            fixed.add(v)
+
+        self._cache.set(cache_key, sorted(fixed))
+        return fixed
+
     async def check_malicious(self, name: str, ecosystem: Ecosystem, version: str = "") -> list[Advisory]:
         """Return advisories that describe malicious activity for this package."""
         osv_ecosystem = _ECOSYSTEM_MAP.get(ecosystem)

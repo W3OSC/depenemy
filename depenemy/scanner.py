@@ -124,6 +124,13 @@ async def scan(paths: list[Path], config: Config) -> ScanResult:
                         dep.name, target, dep.ecosystem
                     )
 
+                # Package-level fix versions so R010 can exempt a freshly
+                # published version when it's the security fix for a CVE
+                # affecting earlier versions of the same package.
+                meta.security_fix_versions = await osv_advisor.get_fixed_versions(
+                    dep.name, dep.ecosystem
+                )
+
                 # Check for malicious activity history (version-scoped)
                 meta.malicious_advisories = await osv_advisor.check_malicious(
                     dep.name, dep.ecosystem, version=target or ""

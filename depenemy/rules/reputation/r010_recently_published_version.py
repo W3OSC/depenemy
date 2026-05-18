@@ -30,6 +30,14 @@ class R010RecentlyPublishedVersion(BaseRule):
         if not meta.published_at:
             return None
 
+        # The cooldown protects against unvetted new versions, but a version
+        # that exists because it patches a CVE has the opposite risk profile:
+        # delaying its adoption keeps the user on a known-vulnerable version.
+        # OSV's `fixed` events are sourced from vetted advisories (GHSA, PyPA,
+        # RustSec), so we trust them as a signal that this version is a fix.
+        if meta.target_version in meta.security_fix_versions:
+            return None
+
         now = datetime.now(timezone.utc)
         published = meta.published_at
         if published.tzinfo is None:
